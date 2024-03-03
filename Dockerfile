@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18-alpine as base
 
 WORKDIR /app
 
@@ -9,6 +9,8 @@ RUN yarn install
 COPY . .
 
 RUN rm -rf dist
+
+EXPOSE 3000
 
 ARG NODE_ENV=$NODE_ENV
 RUN if [ "$NODE_ENV" = "production" ]; \ 
@@ -21,4 +23,3 @@ RUN if [ "$NODE_ENV" = "production" ]; \
         && yarn install --production; \
     fi
 
-EXPOSE 3000

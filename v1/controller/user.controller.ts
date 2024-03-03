@@ -27,13 +27,15 @@ export async function getUserByIdHandler(
     const { userId } = req.params;
     const user = await getUserById(userId);
 
-    return res.send(user);
+    return res.status(200).send(user);
   } catch (err: any) {
     if (err instanceof UserNotFoundError) {
       return res.status(404).send({ ...err, message: err.message });
     }
 
-    return res.status(500).send("Could not retrieve user. Please try again.");
+    return res
+      .status(500)
+      .send({ message: "Could not retrieve user. Please try again." });
   }
 }
 

@@ -25,7 +25,7 @@ function gracefulShutdown(
   });
 }
 
-async function startServer() {
+export async function startServer() {
   const app = createServer();
 
   const server = app.listen(port, () => {

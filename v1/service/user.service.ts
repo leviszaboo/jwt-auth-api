@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import { UserInput, User } from "../models/user.model";
 import pool from "../db/connect";
 import { signJwt, verifyJwt } from "../utils/jwt.utils";
+import { omit } from "lodash";
 import UserNotFoundError from "../errors/user/UserNotFoundError";
 import config from "config";
 import IncorrectPasswordError from "../errors/user/IncorrectPasswordError";
@@ -11,7 +12,9 @@ import EmailExistsError from "../errors/user/EmailExistsError";
 
 const salt = config.get<number>("bcrypt.salt");
 
-export async function getUserById(id: string) {
+export async function getUserById(
+  id: string,
+): Promise<Omit<User, "password_hash">> {
   try {
     const [user] = await pool.query<User[]>(
       "SELECT * FROM users WHERE user_id = ?",
@@ -22,7 +25,7 @@ export async function getUserById(id: string) {
       throw new UserNotFoundError("User not found with the provided user ID.");
     }
 
-    return user[0];
+    return omit(user[0], ["password_hash"]);
   } catch (err: any) {
     throw err;
   }
@@ -35,7 +38,7 @@ export async function getUserByEmail(email: string) {
       [email],
     );
 
-    return user[0];
+    return omit(user[0], ["password_hash"]);
   } catch (err: any) {
     throw err;
   }
