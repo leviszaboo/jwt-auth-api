@@ -28,6 +28,20 @@ jobs:
           echo ---Containers up--
       - name: Run tests
         run: |
+          echo ---Creating .env file---
+          touch .env
+          echo API_KEY=${{ secrets.API_KEY }} > .env
+          echo APP_ID=${{ secrets.APP_ID }} > .env
+          echo ACT_PRIVATE_KEY=${{ secrets.ACT_PRIVATE_KEY }} > .env
+          echo ACT_PUBLIC_KEY=${{ secrets.ACT_PUBLIC_KEY }} > .env
+          echo RFT_PRIVATE_KEY=${{ secrets.RFT_PRIVATE_KEY }} > .env
+          echo RFT_PUBLIC_KEY=${{ secrets.RFT_PUBLIC_KEY }} > .env
+          echo MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} > .env
+          echo MYSQL_USER=${{ secrets.MYSQL_USER }} > .env
+          echo MYSQL_HOST=${{ secrets.MYSQL_HOST }} > .env
+          echo MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }} > .env
+          echo BCYPT_SALT=${{ secrets.BCYPT_SALT }} > .env
+          echo ---.env file created---
           echo ---Running tests---
           yarn && yarn test
           echo ---Tests done---
