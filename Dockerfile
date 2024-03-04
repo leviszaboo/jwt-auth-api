@@ -3,6 +3,9 @@ FROM node:18-alpine as base
 WORKDIR /app
 
 COPY package.json .
+COPY yarn.lock .
+
+COPY prisma ./prisma/ 
 
 RUN yarn install
 

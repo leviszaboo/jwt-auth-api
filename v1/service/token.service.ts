@@ -1,16 +1,17 @@
-import pool from "../db/connect";
+import { prisma } from "../db/connect";
 import { signJwt, verifyJwt } from "../utils/jwt.utils";
 import { BlackList } from "../models/blacklist.model";
 import { getUserById } from "./user.service";
 
 export async function checkBlackListedToken(token: string) {
   try {
-    const [blackListedToken] = await pool.query<BlackList[]>(
-      `SELECT * FROM blacklist WHERE token = ?`,
-      [token],
-    );
+    const blackListedToken = await prisma.blacklist.findUnique({
+      where: {
+        token: token,
+      },
+    });
 
-    return blackListedToken[0];
+    return blackListedToken ? true : false;
   } catch (err: any) {
     throw err;
   }
@@ -22,7 +23,11 @@ export async function blackListToken(token: string) {
   }
 
   try {
-    await pool.query(`INSERT INTO blacklist (token) VALUES (?)`, [token]);
+    await prisma.blacklist.create({
+      data: {
+        token: token,
+      },
+    });
   } catch (err: any) {
     throw err;
   }

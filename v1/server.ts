@@ -4,7 +4,7 @@ import logger from "./utils/logger";
 import createServer from "./utils/createServer";
 import { GracefulShutdownManager } from "@moebius/http-graceful-shutdown";
 import { Server } from "http";
-import closeConnection from "./db/cleanup";
+import { disconnectPostgres } from "./db/cleanup";
 import swaggerDocs from "./utils/swagger";
 import { exit } from "process";
 
@@ -18,7 +18,7 @@ function gracefulShutdown(
 ) {
   const shutdownManager = new GracefulShutdownManager(server);
   logger.info(`Received ${signal}. Starting graceful shutdown.`);
-  closeConnection();
+  disconnectPostgres();
   shutdownManager.terminate(() => {
     logger.info("Server is gracefully terminated");
     exit(0);
@@ -30,7 +30,7 @@ export async function startServer() {
 
   const server = app.listen(port, () => {
     logger.info(`App is running on http://localhost:${port}`);
-    logger.info(`Initializing MySQL connection...`);
+    logger.info(`Initializing PostgreSQL connection...`);
 
     swaggerDocs(app, port);
 

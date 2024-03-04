@@ -1,10 +1,8 @@
-import { ResultSetHeader } from "mysql2";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import { UserInput, User } from "../models/user.model";
-import pool from "../db/connect";
-import { signJwt, verifyJwt } from "../utils/jwt.utils";
-import { omit } from "lodash";
+import { prisma } from "../db/connect";
+import { signJwt } from "../utils/jwt.utils";
 import UserNotFoundError from "../errors/user/UserNotFoundError";
 import config from "config";
 import IncorrectPasswordError from "../errors/user/IncorrectPasswordError";
@@ -16,40 +14,49 @@ export async function getUserById(
   id: string,
 ): Promise<Omit<User, "password_hash">> {
   try {
-    const [user] = await pool.query<User[]>(
-      "SELECT * FROM users WHERE user_id = ?",
-      [id],
-    );
+    const user = await prisma.users.findUnique({
+      where: {
+        user_id: id,
+      },
+      select: {
+        user_id: true,
+        email: true,
+        email_verified: true,
+      },
+    });
 
-    if (!user[0]) {
+    if (!user) {
       throw new UserNotFoundError("User not found with the provided user ID.");
     }
 
-    return omit(user[0], ["password_hash"]);
+    return user;
   } catch (err: any) {
     throw err;
   }
 }
 
-export async function getUserByEmail(email: string) {
+export async function getUserByEmail(email: string): Promise<User> {
   try {
-    const [user] = await pool.query<User[]>(
-      "SELECT * FROM users WHERE email = ?",
-      [email],
-    );
+    const user = await prisma.users.findUnique({
+      where: {
+        email: email,
+      },
+    });
 
-    return omit(user[0], ["password_hash"]);
+    if (!user) {
+      throw new UserNotFoundError(
+        "User not found with the provided email address.",
+      );
+    }
+
+    return user;
   } catch (err: any) {
     throw err;
   }
 }
 
 interface AuthResponse {
-  user: {
-    userId: string;
-    email: string;
-    emailVerified: boolean;
-  };
+  user: Omit<User, "password_hash">;
   accessToken: string;
   refreshToken: string;
 }
@@ -92,9 +99,9 @@ export async function loginUser(input: UserInput): Promise<AuthResponse> {
 
     return {
       user: {
-        userId: user.user_id,
+        user_id: user.user_id,
         email: user.email,
-        emailVerified: user.email_verified === 1,
+        email_verified: user.email_verified,
       },
       accessToken: token,
       refreshToken: refreshToken,
@@ -117,30 +124,15 @@ export async function createUser(input: UserInput) {
     const userId = uuidv4();
     const passwordHash = await bcrypt.hash(input.password, salt);
 
-    const [userInsertResult] = await pool.query<ResultSetHeader>(
-      `INSERT INTO users (
-                user_id,
-                email,
-                password_hash
-            )
-            VALUES (?, ?, ?)`,
-      [userId, input.email, passwordHash],
-    );
+    const user = await prisma.users.create({
+      data: {
+        user_id: userId,
+        email: input.email,
+        password_hash: passwordHash,
+      },
+    });
 
-    if (userInsertResult.affectedRows === 1) {
-      const newlyCreatedUser = await getUserByEmail(input.email);
-
-      if (newlyCreatedUser) {
-        return {
-          user_id: newlyCreatedUser.user_id,
-          email: newlyCreatedUser.email,
-        };
-      } else {
-        throw new Error("Failed to retrieve the user.");
-      }
-    } else {
-      throw new Error("Failed to insert the user.");
-    }
+    return user;
   } catch (err: any) {
     throw err;
   }
@@ -148,10 +140,11 @@ export async function createUser(input: UserInput) {
 
 export async function deleteUser(id: string) {
   try {
-    const [user] = await pool.query<User[]>(
-      "DELETE FROM users WHERE user_id = ?",
-      [id],
-    );
+    const user = await prisma.users.delete({
+      where: {
+        user_id: id,
+      },
+    });
 
     if (!user) {
       throw new UserNotFoundError("User not found with the provided user ID.");
@@ -165,10 +158,14 @@ export async function deleteUser(id: string) {
 
 export async function updateEmail(id: string, newEmail: string) {
   try {
-    const [user] = await pool.query<User[]>(
-      "UPDATE users SET email = ? WHERE user_id = ?",
-      [newEmail, id],
-    );
+    const user = await prisma.users.update({
+      where: {
+        user_id: id,
+      },
+      data: {
+        email: newEmail,
+      },
+    });
 
     if (!user) {
       throw new UserNotFoundError("User not found with the provided user ID.");
@@ -184,10 +181,14 @@ export async function updatePassword(id: string, newPassword: string) {
   try {
     const passwordHash = await bcrypt.hash(newPassword, salt);
 
-    const [user] = await pool.query<User[]>(
-      "UPDATE users SET password_hash = ? WHERE user_id = ?",
-      [passwordHash, id],
-    );
+    const user = await prisma.users.update({
+      where: {
+        user_id: id,
+      },
+      data: {
+        password_hash: passwordHash,
+      },
+    });
 
     if (!user) {
       throw new UserNotFoundError("User not found with the provided user ID.");

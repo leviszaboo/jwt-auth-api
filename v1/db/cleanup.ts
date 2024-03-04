@@ -1,7 +1,7 @@
 import logger from "../utils/logger";
-import pool from "./connect";
+import { prisma } from "./connect";
 
-export default function closeConnection() {
-  pool.end();
-  logger.info(`MySQL connection closed.`);
+export async function disconnectPostgres() {
+  await prisma.$disconnect();
+  logger.info("PostgreSQL disconnected");
 }

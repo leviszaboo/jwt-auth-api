@@ -1,5 +1,3 @@
-import { RowDataPacket } from "mysql2";
+import type { PrismaModels } from "./PrismaModels";
 
-export interface BlackList extends RowDataPacket {
-  token: string;
-}
+export type BlackList = PrismaModels["blacklist"];

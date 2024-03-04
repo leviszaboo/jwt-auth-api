@@ -1,13 +1,8 @@
-import { RowDataPacket } from "mysql2";
+import type { PrismaModels } from "./PrismaModels";
 
-export interface UserInput {
+export type UserInput = {
   email: string;
   password: string;
-}
+};
 
-export interface User extends RowDataPacket {
-  user_id: string;
-  email: string;
-  password_hash: string;
-  email_verified: 0 | 1;
-}
+export type User = PrismaModels["users"];

@@ -30,8 +30,6 @@ services:
     user: postgres
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "5532:5432"
     volumes:
       - "./postgres-init/init.sql:/docker-entrypoint-initdb.d/init.sql"
     restart: always
