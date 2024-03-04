@@ -44,9 +44,9 @@ export async function loginUserHandler(
   res: Response,
 ) {
   try {
-    const { user, accessToken, refreshToken } = await loginUser(req.body);
+    const authResponseData = await loginUser(req.body);
 
-    return res.send({ user, accessToken, refreshToken });
+    return res.send(authResponseData);
   } catch (err: any) {
     if (err instanceof UserNotFoundError) {
       return res.status(404).send({ ...err, message: err.message });

@@ -1,53 +1,49 @@
 import { prisma } from "../db/connect";
 import { signJwt, verifyJwt } from "../utils/jwt.utils";
-import { BlackList } from "../models/blacklist.model";
+import { BlackList, TokenPair } from "../types/token.types";
 import { getUserById } from "./user.service";
 
-export async function checkBlackListedToken(token: string) {
-  try {
-    const blackListedToken = await prisma.blacklist.findUnique({
-      where: {
-        token: token,
-      },
-    });
+export async function checkBlackListedToken(token: string): Promise<boolean> {
+  const blacklisted = await prisma.blacklist.findUnique({
+    where: {
+      token: token,
+    },
+  });
 
-    return blackListedToken ? true : false;
-  } catch (err: any) {
-    throw err;
-  }
+  return !!blacklisted;
 }
 
-export async function blackListToken(token: string) {
-  if (await checkBlackListedToken(token)) {
+export async function blackListToken(token: string): Promise<void> {
+  const blacklisted = await checkBlackListedToken(token);
+
+  if (blacklisted) {
     return;
   }
 
-  try {
-    await prisma.blacklist.create({
-      data: {
-        token: token,
-      },
-    });
-  } catch (err: any) {
-    throw err;
-  }
+  await prisma.blacklist.create({
+    data: {
+      token: token,
+    },
+  });
 }
 
-export async function reissueAccessToken(refreshToken: string) {
+export async function reissueAccessToken(
+  refreshToken: string,
+): Promise<TokenPair> {
   const { decoded } = await verifyJwt(refreshToken, "refresh");
 
   if (!decoded)
     return {
-      newAccessToken: null,
-      newRefreshToken: null,
+      accessToken: null,
+      refreshToken: null,
     };
 
   const user = await getUserById(decoded.userId);
 
   if (!user)
     return {
-      newAccessToken: null,
-      newRefreshToken: null,
+      accessToken: null,
+      refreshToken: null,
     };
 
   const newRefreshToken = signJwt({ userId: user.user_id }, "refresh", {
@@ -63,7 +59,7 @@ export async function reissueAccessToken(refreshToken: string) {
   );
 
   return {
-    newAccessToken: newAccessToken,
-    newRefreshToken: newRefreshToken,
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
   };
 }

@@ -23,7 +23,7 @@ export async function reissueAccessTokenHandler(
       return res.status(401).send("Invalid refresh token.");
     }
 
-    const { newAccessToken, newRefreshToken } =
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
       await reissueAccessToken(refreshToken);
 
     if (!newAccessToken || !newRefreshToken) {

@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from "@prisma/client";
+import type { PrismaClient, Prisma } from "@prisma/client";
 
 type ModelNames = Prisma.ModelName;
 
