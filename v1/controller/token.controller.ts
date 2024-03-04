@@ -33,6 +33,7 @@ export async function reissueAccessTokenHandler(
     return res.send({ newAccessToken, newRefreshToken });
   } catch (err: any) {
     logger.error(err);
+
     return res
       .status(500)
       .send("Unable to reissue access token. Please try again.");
@@ -58,6 +59,8 @@ export async function invalidateTokenHandler(
     res.clearCookie("refresh");
     res.sendStatus(204);
   } catch (err: any) {
+    logger.error(err);
+
     return res.status(500).send("Unsuccessful logout. Please try again.");
   }
 }

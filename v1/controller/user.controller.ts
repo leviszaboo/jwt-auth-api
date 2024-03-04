@@ -18,6 +18,7 @@ import UserNotFoundError from "../errors/user/UserNotFoundError";
 import IncorrectPasswordError from "../errors/user/IncorrectPasswordError";
 import EmailExistsError from "../errors/user/EmailExistsError";
 import { setTokenCookie } from "../utils/jwt.utils";
+import logger from "../utils/logger";
 
 export async function getUserByIdHandler(
   req: Request<GetUserByIdInput["params"]>,
@@ -32,6 +33,8 @@ export async function getUserByIdHandler(
     if (err instanceof UserNotFoundError) {
       return res.status(404).send({ ...err, message: err.message });
     }
+
+    logger.error(err);
 
     return res
       .status(500)
@@ -56,6 +59,8 @@ export async function loginUserHandler(
       return res.status(401).send({ ...err, message: err.message });
     }
 
+    logger.error(err);
+
     return res.status(500).send("Unable to login. Please try again.");
   }
 }
@@ -72,6 +77,8 @@ export async function createUserHandler(
     if (err instanceof EmailExistsError) {
       return res.status(409).send({ ...err, message: err.message });
     }
+
+    logger.error(err);
 
     return res.status(500).send("Unable to create user. Please try again.");
   }
@@ -90,6 +97,8 @@ export async function deleteUserHandler(
     if (err instanceof UserNotFoundError) {
       return res.status(404).send({ ...err, message: err.message });
     }
+
+    logger.error(err);
 
     return res.status(500).send("Unable to delete user. Please try again.");
   }
@@ -110,6 +119,8 @@ export async function updateEmailHandler(
       return res.status(404).send({ ...err, message: err.message });
     }
 
+    logger.error(err);
+
     return res.status(500).send("Unable to update email. Please try again.");
   }
 }
@@ -128,6 +139,8 @@ export async function updatePasswordHandler(
     if (err instanceof UserNotFoundError) {
       return res.status(404).send({ ...err, message: err.message });
     }
+
+    logger.error(err);
 
     return res.status(500).send("Unable to update password. Please try again.");
   }

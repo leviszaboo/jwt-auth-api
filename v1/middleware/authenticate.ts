@@ -6,8 +6,8 @@ export default function authenticate(
   res: Response,
   next: NextFunction,
 ) {
-  const apiKey = req.headers["X-Gator-Api-Key"];
-  const appId = req.headers["X-Gator-App-Id"];
+  const apiKey = req.headers["x-gator-api-key"];
+  const appId = req.headers["x-gator-app-id"];
 
   if (!apiKey) {
     return res.status(401).send("Missing API Key.");
@@ -17,7 +17,7 @@ export default function authenticate(
     return res.status(401).send("Missing App ID.");
   }
 
-  if (apiKey !== config.get("API_KEY") || appId !== config.get("APP_ID")) {
+  if (apiKey !== config.get("apiKey") || appId !== config.get("appId")) {
     return res.status(401).send("Provided API Key or App ID is invalid.");
   }
 

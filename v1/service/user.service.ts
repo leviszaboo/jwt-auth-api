@@ -12,6 +12,7 @@ import UserNotFoundError from "../errors/user/UserNotFoundError";
 import config from "config";
 import IncorrectPasswordError from "../errors/user/IncorrectPasswordError";
 import EmailExistsError from "../errors/user/EmailExistsError";
+import logger from "../utils/logger";
 
 const salt = config.get<number>("bcrypt.salt");
 
@@ -53,12 +54,6 @@ export async function getUserByEmail(email: string): Promise<User> {
 export async function loginUser(input: UserInput): Promise<AuthResponse> {
   const user = await getUserByEmail(input.email);
 
-  if (!user) {
-    throw new UserNotFoundError(
-      "User not found with the provided email address.",
-    );
-  }
-
   const passwordMatch = await bcrypt.compare(
     input.password,
     user.password_hash,
@@ -94,75 +89,97 @@ export async function loginUser(input: UserInput): Promise<AuthResponse> {
   };
 }
 
-export async function createUser(input: UserInput) {
-  const existingUser = await getUserByEmail(input.email);
-
-  if (existingUser) {
-    throw new EmailExistsError(
-      "A user account with the provided email address already exists.",
-    );
-  }
-
+export async function createUser(input: UserInput): Promise<User> {
   const userId = uuidv4();
   const passwordHash = await bcrypt.hash(input.password, salt);
 
-  const user = await prisma.users.create({
-    data: {
-      user_id: userId,
-      email: input.email,
-      password_hash: passwordHash,
-    },
-  });
+  try {
+    const user = await prisma.users.create({
+      data: {
+        user_id: userId,
+        email: input.email,
+        password_hash: passwordHash,
+      },
+    });
 
-  return user;
+    return user;
+  } catch (err: any) {
+    if (err.code === "P2002") {
+      throw new EmailExistsError(
+        "A user with the provided email address already exists.",
+      );
+    }
+
+    logger.error(err);
+
+    throw err;
+  }
 }
 
 export async function deleteUser(id: string) {
-  const user = await prisma.users.delete({
-    where: {
-      user_id: id,
-    },
-  });
+  try {
+    await prisma.users.delete({
+      where: {
+        user_id: id,
+      },
+    });
 
-  if (!user) {
-    throw new UserNotFoundError("User not found with the provided user ID.");
+    return true;
+  } catch (err: any) {
+    if ((err.code = "P2025")) {
+      throw new UserNotFoundError("User not found with the provided user ID.");
+    }
+
+    logger.error(err);
+
+    throw err;
   }
-
-  return true;
 }
 
 export async function updateEmail(id: string, newEmail: string) {
-  const user = await prisma.users.update({
-    where: {
-      user_id: id,
-    },
-    data: {
-      email: newEmail,
-    },
-  });
+  try {
+    await prisma.users.update({
+      where: {
+        user_id: id,
+      },
+      data: {
+        email: newEmail,
+      },
+    });
 
-  if (!user) {
-    throw new UserNotFoundError("User not found with the provided user ID.");
+    return true;
+  } catch (err: any) {
+    if ((err.code = "P2025")) {
+      throw new UserNotFoundError("User not found with the provided user ID.");
+    }
+
+    logger.error(err);
+
+    throw err;
   }
-
-  return true;
 }
 
 export async function updatePassword(id: string, newPassword: string) {
   const passwordHash = await bcrypt.hash(newPassword, salt);
 
-  const user = await prisma.users.update({
-    where: {
-      user_id: id,
-    },
-    data: {
-      password_hash: passwordHash,
-    },
-  });
+  try {
+    await prisma.users.update({
+      where: {
+        user_id: id,
+      },
+      data: {
+        password_hash: passwordHash,
+      },
+    });
 
-  if (!user) {
-    throw new UserNotFoundError("User not found with the provided user ID.");
+    return true;
+  } catch (err: any) {
+    if ((err.code = "P2025")) {
+      throw new UserNotFoundError("User not found with the provided user ID.");
+    }
+
+    logger.error(err);
+
+    throw err;
   }
-
-  return true;
 }

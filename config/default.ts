@@ -6,7 +6,7 @@ export default {
   apiKey: process.env.API_KEY,
   appId: process.env.APP_ID,
   bcrypt: {
-    salt: process.env.BCRYPT_SALT,
+    salt: 10,
   },
   db: {
     dbHost: process.env.MYSQL_HOST,
