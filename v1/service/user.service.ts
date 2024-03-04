@@ -6,7 +6,7 @@ import {
   OmitPasswordHash,
   AuthResponse,
 } from "../types/user.types";
-import { prisma } from "../db/connect";
+import { prisma } from "../db/prisma";
 import { signJwt } from "../utils/jwt.utils";
 import UserNotFoundError from "../errors/user/UserNotFoundError";
 import config from "config";

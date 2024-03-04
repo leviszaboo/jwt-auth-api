@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "./prisma";
 import logger from "../utils/logger";
-
-export const prisma = new PrismaClient();
 
 async function handleConnection(elapsedTime: number = 0): Promise<void> {
   const maxTime = 120000;

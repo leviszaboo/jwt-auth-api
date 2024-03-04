@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as UserService from "../../../service/user.service";
-import createServer from "../../../utils/createServer";
 import { getUserByIdHandler } from "../../user.controller";
 import { Request, Response } from "express";
 import { GetUserByIdInput } from "../../../schema/user.schema";
@@ -26,7 +25,7 @@ describe("getUserByIdHandler", () => {
     const user = {
       user_id: "1",
       email: "email@email.com",
-      email_verified: 0,
+      email_verified: false,
     };
 
     const spy = vi.spyOn(UserService, "getUserById");

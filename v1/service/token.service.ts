@@ -1,4 +1,4 @@
-import { prisma } from "../db/connect";
+import { prisma } from "../db/prisma";
 import { signJwt, verifyJwt } from "../utils/jwt.utils";
 import { BlackList, TokenPair } from "../types/token.types";
 import { getUserById } from "./user.service";
