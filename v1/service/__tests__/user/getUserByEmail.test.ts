@@ -1,20 +1,20 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import prisma from "../../../db/__mocks__/prisma";
 
-import { getUserById } from "../../../service/user.service";
+import { getUserByEmail } from "../../../service/user.service";
 import UserNotFoundError from "../../../errors/user/UserNotFoundError";
 
 vi.mock("../../../db/prisma", () => ({
   prisma,
 }));
 
-describe("getUserById", () => {
+describe("getUserByEmail", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
   it("should return user data", async () => {
-    const id = "1";
+    const email = "email@email.com";
 
     const user = {
       user_id: "1",
@@ -23,16 +23,11 @@ describe("getUserById", () => {
     };
 
     prisma.users.findUnique.mockResolvedValue(user as any); // not aware of select
-    const result = await getUserById(id);
+    const result = await getUserByEmail(email);
 
     expect(prisma.users.findUnique).toHaveBeenCalledWith({
       where: {
-        user_id: id,
-      },
-      select: {
-        user_id: true,
-        email: true,
-        email_verified: true,
+        email: email,
       },
     });
 
@@ -40,11 +35,11 @@ describe("getUserById", () => {
   });
 
   it("should throw UserNotFoundError if user not found", async () => {
-    const id = "1";
+    const email = "email@email.com";
 
     prisma.users.findUnique.mockResolvedValue(null);
 
-    await expect(getUserById(id)).rejects.toThrow();
-    await expect(getUserById(id)).rejects.toThrowError(UserNotFoundError);
+    await expect(getUserByEmail(email)).rejects.toThrow();
+    await expect(getUserByEmail(email)).rejects.toThrowError(UserNotFoundError);
   });
 });

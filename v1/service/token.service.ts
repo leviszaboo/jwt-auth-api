@@ -1,6 +1,6 @@
 import { prisma } from "../db/prisma";
 import { signJwt, verifyJwt } from "../utils/jwt.utils";
-import { BlackList, TokenPair } from "../types/token.types";
+import { TokenPair } from "../types/token.types";
 import { getUserById } from "./user.service";
 
 export async function checkBlackListedToken(token: string): Promise<boolean> {
@@ -14,12 +14,6 @@ export async function checkBlackListedToken(token: string): Promise<boolean> {
 }
 
 export async function blackListToken(token: string): Promise<void> {
-  const blacklisted = await checkBlackListedToken(token);
-
-  if (blacklisted) {
-    return;
-  }
-
   await prisma.blacklist.create({
     data: {
       token: token,
@@ -38,7 +32,7 @@ export async function reissueAccessToken(
       refreshToken: null,
     };
 
-  const user = await getUserById(decoded.userId);
+  const user = await getUserById(decoded.userId).catch(() => null);
 
   if (!user)
     return {
@@ -46,12 +40,21 @@ export async function reissueAccessToken(
       refreshToken: null,
     };
 
-  const newRefreshToken = signJwt({ userId: user.user_id }, "refresh", {
-    expiresIn: "1d",
-  });
+  const newRefreshToken = signJwt(
+    {
+      userId: user.user_id,
+    },
+    "refresh",
+    {
+      expiresIn: "1d",
+    },
+  );
 
   const newAccessToken = signJwt(
-    { userId: user.user_id, email: user.email },
+    {
+      userId: user.user_id,
+      email: user.email,
+    },
     "access",
     {
       expiresIn: "5m",

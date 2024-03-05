@@ -47,12 +47,12 @@ export async function invalidateTokenHandler(
   try {
     const { accessToken, refreshToken } = req.body;
 
-    if (accessToken) {
-      await blackListToken(accessToken);
-    }
+    for (const token of [accessToken, refreshToken]) {
+      const blacklisted = await checkBlackListedToken(token);
 
-    if (refreshToken) {
-      await blackListToken(refreshToken);
+      if (token && !blacklisted) {
+        await blackListToken(token);
+      }
     }
 
     res.setHeader("Authorization", "");
