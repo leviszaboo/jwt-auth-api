@@ -19,8 +19,15 @@ services:
   postgres:
     image: postgres
     user: postgres
+    ports:
+      - "5532:5432"
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
+      - db:/var/lib/postgresql/data
       - "./postgres-init/init.sql:/docker-entrypoint-initdb.d/init.sql"
     restart: always
+
+volumes:
+  db:
+    driver: local

@@ -33,8 +33,6 @@ export async function startServer() {
     logger.info(`Initializing PostgreSQL connection...`);
 
     swaggerDocs(app, port);
-
-    routes(app);
   });
 
   shutdownSignals.forEach((signal) => {

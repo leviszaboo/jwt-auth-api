@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authenticate from "../middleware/authenticate";
+import routes from "../routes";
 
 export default function createServer() {
   const app = express();
@@ -12,6 +13,8 @@ export default function createServer() {
   app.use(express.json());
   app.use(cookieParser());
   app.use(authenticate);
+
+  routes(app);
 
   return app;
 }

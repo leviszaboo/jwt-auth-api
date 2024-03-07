@@ -10,7 +10,7 @@ export default function authenticate(
   const appId = req.headers["x-gator-app-id"];
 
   if (!apiKey) {
-    return res.status(401).send("Missing API Key.");
+    return res.status(401).send("Missing API key.");
   }
 
   if (!appId) {

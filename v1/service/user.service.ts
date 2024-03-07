@@ -13,6 +13,7 @@ import config from "config";
 import IncorrectPasswordError from "../errors/user/IncorrectPasswordError";
 import EmailExistsError from "../errors/user/EmailExistsError";
 import logger from "../utils/logger";
+import { omit } from "lodash";
 
 const salt = config.get<number>("bcrypt.salt");
 
@@ -89,7 +90,9 @@ export async function loginUser(input: UserInput): Promise<AuthResponse> {
   };
 }
 
-export async function createUser(input: UserInput): Promise<User> {
+export async function createUser(
+  input: UserInput,
+): Promise<OmitPasswordHash<User>> {
   const userId = uuidv4();
   const passwordHash = await bcrypt.hash(input.password, salt);
 
@@ -102,7 +105,7 @@ export async function createUser(input: UserInput): Promise<User> {
       },
     });
 
-    return user;
+    return omit(user, "password_hash");
   } catch (err: any) {
     if (err.code === "P2002") {
       throw new EmailExistsError(
