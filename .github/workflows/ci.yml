@@ -24,13 +24,14 @@ jobs:
         with:
           ENV_API_KEY: ${{ secrets.API_KEY }}
           ENV_APP_ID: ${{ secrets.APP_ID }}
+          ENV_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           ENV_ACT_PRIVATE_KEY: ${{ secrets.ACT_PRIVATE_KEY }}
           ENV_ACT_PUBLIC_KEY: ${{ secrets.ACT_PUBLIC_KEY }}
           ENV_RFT_PRIVATE_KEY: ${{ secrets.RFT_PRIVATE_KEY }}
           ENV_RFT_PUBLIC_KEY: ${{ secrets.RFT_PUBLIC_KEY }}
           ENV_DATABASE_URL: ${{ secrets.DATABASE_URL }}
           ENV_BCYPT_SALT: ${{ secrets.BCYPT_SALT }}
-      - name: Production build
-        run: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
       - name: Run tests
         run: yarn test
+      - name: Production build
+        run: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
