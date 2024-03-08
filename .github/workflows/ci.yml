@@ -3,10 +3,10 @@ name: CI-pipeline
 on:
   push:
     branches:
-      - main
+      - [main, master]
   pull_request:
     branches:
-      - main
+      - [main, master]
 
 jobs:
   build:
@@ -15,41 +15,20 @@ jobs:
       image: leviszaboo/act_base:latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: yarn install
+      - name: Create .env file
+        uses: ozaytsev86/create-env-file@v1
+        with:
+          ENV_API_KEY: ${{ secrets.API_KEY }}
+          ENV_APP_ID: ${{ secrets.APP_ID }}
+          ENV_ACT_PRIVATE_KEY: ${{ secrets.ACT_PRIVATE_KEY }}
+          ENV_ACT_PUBLIC_KEY: ${{ secrets.ACT_PUBLIC_KEY }}
+          ENV_RFT_PRIVATE_KEY: ${{ secrets.RFT_PRIVATE_KEY }}
+          ENV_RFT_PUBLIC_KEY: ${{ secrets.RFT_PUBLIC_KEY }}
+          ENV_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ENV_BCYPT_SALT: ${{ secrets.BCYPT_SALT }}
       - name: Production build
-        run: |
-          echo ---Creating .env file---
-          touch .env
-          echo API_KEY=${{ secrets.API_KEY }} > .env
-          echo APP_ID=${{ secrets.APP_ID }} > .env
-          echo ACT_PRIVATE_KEY=${{ secrets.ACT_PRIVATE_KEY }} > .env
-          echo ACT_PUBLIC_KEY=${{ secrets.ACT_PUBLIC_KEY }} > .env
-          echo RFT_PRIVATE_KEY=${{ secrets.RFT_PRIVATE_KEY }} > .env
-          echo RFT_PUBLIC_KEY=${{ secrets.RFT_PUBLIC_KEY }} > .env
-          echo MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} > .env
-          echo MYSQL_USER=${{ secrets.MYSQL_USER }} > .env
-          echo MYSQL_HOST=${{ secrets.MYSQL_HOST }} > .env
-          echo MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }} > .env
-          echo BCYPT_SALT=${{ secrets.BCYPT_SALT }} > .env
-          echo ---.env file created---
-          echo ---Building and starting up docker---
-          docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-          echo ---Containers up--
+        run: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
       - name: Run tests
-        run: |
-          echo ---Creating .env file---
-          touch .env
-          echo API_KEY=${{ secrets.API_KEY }} > .env
-          echo APP_ID=${{ secrets.APP_ID }} > .env
-          echo ACT_PRIVATE_KEY=${{ secrets.ACT_PRIVATE_KEY }} > .env
-          echo ACT_PUBLIC_KEY=${{ secrets.ACT_PUBLIC_KEY }} > .env
-          echo RFT_PRIVATE_KEY=${{ secrets.RFT_PRIVATE_KEY }} > .env
-          echo RFT_PUBLIC_KEY=${{ secrets.RFT_PUBLIC_KEY }} > .env
-          echo MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} > .env
-          echo MYSQL_USER=${{ secrets.MYSQL_USER }} > .env
-          echo MYSQL_HOST=${{ secrets.MYSQL_HOST }} > .env
-          echo MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }} > .env
-          echo BCYPT_SALT=${{ secrets.BCYPT_SALT }} > .env
-          echo ---.env file created---
-          echo ---Running tests---
-          yarn && yarn test
-          echo ---Tests done---
+        run: yarn test

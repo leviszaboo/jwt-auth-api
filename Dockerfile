@@ -15,14 +15,16 @@ RUN rm -rf dist
 
 EXPOSE 3000
 
-ARG NODE_ENV=$NODE_ENV
-RUN if [ "$NODE_ENV" = "production" ]; \ 
-    then yarn build \
-        && rm -rf node_modules \
-        && rm -rf config\
-        && rm -rf v1 \
-        && rm tsconfig.json \
-        && mv ./dist/config ./config \
-        && yarn install --production; \
-    fi
+FROM base as prod
+
+RUN yarn build
+RUN rm -rf node_modules
+RUN rm -rf config
+RUN rm -rf v1
+RUN rm tsconfig.json
+RUN mv ./dist/config ./config
+RUN yarn install --production
+
+CMD ["yarn", "start"]
+
 

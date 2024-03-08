@@ -6,8 +6,7 @@ services:
   node-app:
     build:
       context: .
-      args:
-        - NODE_ENV=development
+      target: base
     volumes:
       - ./:/app:ro
       - /app/node_modules

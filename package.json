@@ -10,10 +10,11 @@
     "build": "tsc",
     "start": "node dist/v1/server.js",
     "prepare": "husky || true",
-    "test:unit": "vitest -c ./vitest.config.unit.ts",
+    "test:unit": "vitest run -c ./vitest.config.unit.ts",
     "test:unit:ui": "vitest -c ./vitest.config.unit.ts --ui",
     "test:int": "./scripts/run-integration.sh",
-    "test:int:ui": "./scripts/run-integration.sh --ui"
+    "test:int:ui": "./scripts/run-integration.sh --ui",
+    "test": "yarn test:unit && yarn test:int"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
