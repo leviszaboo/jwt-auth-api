@@ -20,17 +20,17 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Create .env file
-        uses: ozaytsev86/create-env-file@v1
+        uses: SpicyPizza/create-envfile@v2.0
         with:
-          ENV_API_KEY: ${{ secrets.API_KEY }}
-          ENV_APP_ID: ${{ secrets.APP_ID }}
-          ENV_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          ENV_ACT_PRIVATE_KEY: ${{ secrets.ACT_PRIVATE_KEY }}
-          ENV_ACT_PUBLIC_KEY: ${{ secrets.ACT_PUBLIC_KEY }}
-          ENV_RFT_PRIVATE_KEY: ${{ secrets.RFT_PRIVATE_KEY }}
-          ENV_RFT_PUBLIC_KEY: ${{ secrets.RFT_PUBLIC_KEY }}
-          ENV_DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          ENV_BCYPT_SALT: ${{ secrets.BCYPT_SALT }}
+          envkey_API_KEY: ${{ secrets.API_KEY }}
+          envkey_APP_ID: ${{ secrets.APP_ID }}
+          envkey_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          envkey_ACT_PRIVATE_KEY: ${{ secrets.ACT_PRIVATE_KEY }}
+          envkey_ACT_PUBLIC_KEY: ${{ secrets.ACT_PUBLIC_KEY }}
+          envkey_RFT_PRIVATE_KEY: ${{ secrets.RFT_PRIVATE_KEY }}
+          envkey_RFT_PUBLIC_KEY: ${{ secrets.RFT_PUBLIC_KEY }}
+          envkey_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          envkey_BCYPT_SALT: ${{ secrets.BCYPT_SALT }}
       - name: Run tests
         run: yarn test
       - name: Production build
