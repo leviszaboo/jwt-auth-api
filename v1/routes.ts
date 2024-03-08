@@ -28,22 +28,6 @@ import {
 export default function routes(app: Express) {
   /**
    * @openapi
-   * /api/v1/ping:
-   *   get:
-   *     tag:
-   *       - "ping"
-   *     description: Returns pong if the server is running
-   *     responses:
-   *       200:
-   *        description: server is running
-   */
-  app.get("/api/v1/ping", (_req: Request, res: Response) => {
-    logger.info("pong");
-    res.status(200).send("pong");
-  });
-
-  /**
-   * @openapi
    * '/api/users/sign-up':
    *  post:
    *     tags:
