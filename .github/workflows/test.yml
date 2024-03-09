@@ -1,4 +1,4 @@
-name: CI-pipeline
+name: CI-pipeline (test)
 
 on:
   push:
@@ -35,5 +35,3 @@ jobs:
           envkey_BCYPT_SALT: ${{ secrets.BCYPT_SALT }}
       - name: Run tests
         run: yarn test
-      - name: Production build
-        run: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
