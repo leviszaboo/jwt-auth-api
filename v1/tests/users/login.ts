@@ -2,6 +2,7 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 import request from "supertest";
 import { AuthResponse } from "../../types/user.types";
 import { exampleUser, apiKey, appId, app, endpoints } from "../helpers/setup";
+import { ZodIssue } from "zod";
 
 export const loginRouteTest = () =>
   describe("[POST] /api/v1/users/login", () => {
@@ -54,6 +55,8 @@ export const loginRouteTest = () =>
         .set("x-gator-app-id", appId);
 
       expect(status).toBe(400);
+
+      expectTypeOf(body).toMatchTypeOf<ZodIssue[]>();
 
       expect(body).toMatchObject([
         {

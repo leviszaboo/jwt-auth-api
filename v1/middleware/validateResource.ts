@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AnyZodObject } from "zod";
+import { AnyZodObject, ZodError } from "zod";
 
 const validateResource =
   (schema: AnyZodObject) =>
@@ -12,7 +12,9 @@ const validateResource =
       });
       next();
     } catch (err: any) {
-      return res.status(400).send(err.errors);
+      if (err instanceof ZodError) return res.status(400).send(err.errors);
+
+      return res.status(500).send("Internal server error.");
     }
   };
 

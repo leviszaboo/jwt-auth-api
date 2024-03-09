@@ -4,6 +4,7 @@ import { loginRouteTest } from "./login";
 import { forIn } from "lodash";
 
 import { endpoints } from "../helpers/setup";
+import { getUserRouteTest } from "./getUser";
 
 //Check for correct authentication on all routes
 
@@ -14,3 +15,5 @@ forIn(endpoints, (value) => testAuthMiddleware(value));
 signUpRouteTest();
 
 loginRouteTest();
+
+getUserRouteTest();

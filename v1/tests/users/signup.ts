@@ -1,6 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import request from "supertest";
 import { exampleUser, apiKey, appId, app, endpoints } from "../helpers/setup";
+import { ZodIssue } from "zod";
 
 export const signUpRouteTest = () =>
   describe("[POST] /api/v1/users/sign-up", () => {
@@ -51,6 +52,8 @@ export const signUpRouteTest = () =>
         .set("x-gator-app-id", appId);
 
       expect(status).toBe(400);
+
+      expectTypeOf(body).toMatchTypeOf<ZodIssue[]>();
 
       expect(body).toMatchObject([
         {
