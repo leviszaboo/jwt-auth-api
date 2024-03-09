@@ -38,6 +38,7 @@ jobs:
       - name: Setup tmate session
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 15
 
   build:
     runs-on: ubuntu-latest
