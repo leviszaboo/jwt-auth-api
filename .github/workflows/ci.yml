@@ -13,8 +13,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container:
-      image: leviszaboo/act_base:latest
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
