@@ -35,6 +35,7 @@ jobs:
           envkey_BCYPT_SALT: ${{ secrets.BCYPT_SALT }}
       - name: Run tests
         run: yarn test
+
   build:
     runs-on: ubuntu-latest
     container:

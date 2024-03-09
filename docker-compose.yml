@@ -16,19 +16,23 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: postgres
     user: postgres
-    ports:
-      - "5532:5432"
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - db:/var/lib/postgresql/data
       - "./postgres-init/init.sql:/docker-entrypoint-initdb.d/init.sql"
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   db:
