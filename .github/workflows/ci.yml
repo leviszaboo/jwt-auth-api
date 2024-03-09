@@ -20,9 +20,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Install PostgreSQL client
-        run: |
-          apt-get update
-          apt-get install --yes postgresql-client
+        run: apt-get update && apt-get install -y postgresql-client
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v2.0
         with:

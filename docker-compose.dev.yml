@@ -4,9 +4,6 @@ services:
     ports:
       - "3000:80"
   node-app:
-    build:
-      context: .
-      target: base
     volumes:
       - ./:/app:ro
       - /app/node_modules

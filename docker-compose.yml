@@ -8,7 +8,9 @@ services:
       - node-app
 
   node-app:
-    build: .
+    build:
+      context: .
+      target: base
     deploy:
       replicas: 2
     env_file:
