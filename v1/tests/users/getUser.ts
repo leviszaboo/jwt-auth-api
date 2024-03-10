@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import request from "supertest";
 import { exampleUser, apiKey, appId, app, endpoints } from "../helpers/setup";
-import { OmitPasswordHash, User } from "../../types/user.types";
+import { User } from "../../types/user.types";
 import { ZodIssue } from "zod";
 
 export const getUserRouteTest = () =>
@@ -24,12 +24,12 @@ export const getUserRouteTest = () =>
 
       expect(status).toBe(200);
 
-      expectTypeOf(body).toMatchTypeOf<OmitPasswordHash<User>>();
+      expectTypeOf(body).toMatchTypeOf<User>();
 
       expect(body).toMatchObject({
-        user_id: loginBody.user_id,
+        userId: loginBody.user_id,
         email: exampleUser.email,
-        email_verified: false,
+        emailVerified: false,
       });
     });
 

@@ -1,8 +1,9 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import prisma from "../../../db/__mocks__/prisma";
 
 import { getUserById } from "../../../service/user.service";
 import UserNotFoundError from "../../../errors/user/UserNotFoundError";
+import { User } from "../../../types/user.types";
 
 vi.mock("../../../db/prisma", () => ({
   prisma,
@@ -16,10 +17,10 @@ describe("getUserById", () => {
   it("should return user data", async () => {
     const id = "1";
 
-    const user = {
-      user_id: "1",
+    const user: User = {
+      userId: "1",
       email: "email@email.com",
-      email_verified: false,
+      emailVerified: false,
     };
 
     prisma.users.findUnique.mockResolvedValue(user as any); // not aware of select
@@ -35,6 +36,8 @@ describe("getUserById", () => {
         email_verified: true,
       },
     });
+
+    expectTypeOf(result).toEqualTypeOf<User>();
 
     expect(result).toStrictEqual(user);
   });

@@ -2,8 +2,9 @@ import resetDb from "./reset-db.js";
 import { beforeAll } from "vitest";
 import config from "config";
 import createServer from "../../utils/createServer.js";
+import { UserInput } from "../../types/user.types.js";
 
-export const exampleUser = {
+export const exampleUser: UserInput = {
   email: "test@gator.io",
   password: "testpassword",
 };

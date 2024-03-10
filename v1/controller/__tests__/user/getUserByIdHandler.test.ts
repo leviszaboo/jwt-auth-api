@@ -4,6 +4,7 @@ import { getUserByIdHandler } from "../../user.controller";
 import { Request, Response } from "express";
 import { GetUserByIdInput } from "../../../schema/user.schema";
 import UserNotFoundError from "../../../errors/user/UserNotFoundError";
+import { User } from "../../../types/user.types";
 
 describe("getUserByIdHandler", () => {
   afterEach(() => {
@@ -22,10 +23,10 @@ describe("getUserByIdHandler", () => {
       send: vi.fn(),
     };
 
-    const user = {
-      user_id: "1",
+    const user: User = {
+      userId: "1",
       email: "email@email.com",
-      email_verified: false,
+      emailVerified: false,
     };
 
     const spy = vi.spyOn(UserService, "getUserById");

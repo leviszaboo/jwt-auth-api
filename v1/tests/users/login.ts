@@ -20,11 +20,11 @@ export const loginRouteTest = () =>
       expectTypeOf(body).toMatchTypeOf<AuthResponse>();
 
       expect(body).toMatchObject({
-        user_id: expect.stringMatching(
+        userId: expect.stringMatching(
           /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/,
         ),
         email: exampleUser.email,
-        email_verified: false,
+        emailVerified: false,
         accessToken: expect.any(String),
         refreshToken: expect.any(String),
       });

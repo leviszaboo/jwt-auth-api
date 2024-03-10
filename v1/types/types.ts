@@ -15,7 +15,7 @@ export type CamelCase<S extends string> =
     : Lowercase<S>;
 
 export type KeysToCamelCase<T> = {
-  [K in keyof T as CamelCase<string & K>]: T[K] extends {}
+  [K in keyof T as CamelCase<string & K>]: T[K] extends Record<string, any>
     ? KeysToCamelCase<T[K]>
     : T[K];
 };

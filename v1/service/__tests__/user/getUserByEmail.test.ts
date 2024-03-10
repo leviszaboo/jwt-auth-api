@@ -3,6 +3,7 @@ import prisma from "../../../db/__mocks__/prisma";
 
 import { getUserByEmail } from "../../../service/user.service";
 import UserNotFoundError from "../../../errors/user/UserNotFoundError";
+import { ModelUser, OmitPasswordHash } from "../../../types/user.types";
 
 vi.mock("../../../db/prisma", () => ({
   prisma,
@@ -16,7 +17,7 @@ describe("getUserByEmail", () => {
   it("should return user data", async () => {
     const email = "email@email.com";
 
-    const user = {
+    const user: OmitPasswordHash<ModelUser> = {
       user_id: "1",
       email: "email@email.com",
       email_verified: false,

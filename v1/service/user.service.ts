@@ -2,7 +2,6 @@ import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import { UserInput, User, AuthResponse, ModelUser } from "../types/user.types";
 import { prisma } from "../db/prisma";
-import { signJwt } from "../utils/jwt.utils";
 import UserNotFoundError from "../errors/user/UserNotFoundError";
 import IncorrectPasswordError from "../errors/user/IncorrectPasswordError";
 import EmailExistsError from "../errors/user/EmailExistsError";
@@ -10,6 +9,10 @@ import logger from "../utils/logger";
 import { snakeToCamelCase } from "./helpers/snakeToCamelCase";
 import { Config, PrismaErrorCodes, TokenOptions } from "../utils/options";
 import InternalServerError from "../errors/global/InternalServerError";
+import { createTokenPair } from "./helpers/createTokenPair";
+import { omit } from "lodash";
+import { checkPasswordMatch } from "./helpers/checkPasswordMatch";
+import { createUserObject } from "./helpers/createUserObject";
 
 export const getUserById = async (id: string): Promise<User> => {
   const user = await prisma.users.findUnique({
@@ -22,7 +25,7 @@ export const getUserById = async (id: string): Promise<User> => {
     throw new UserNotFoundError(`User not found with ID: ${id}`);
   }
 
-  return snakeToCamelCase(user);
+  return createUserObject(user);
 };
 
 export const getUserByEmail = async (email: string): Promise<ModelUser> => {
@@ -42,12 +45,9 @@ export const getUserByEmail = async (email: string): Promise<ModelUser> => {
 };
 
 export const loginUser = async (input: UserInput): Promise<AuthResponse> => {
-  const user = await getUserByEmail(input.email);
+  const existingUser = await getUserByEmail(input.email);
 
-  const passwordMatch = await bcrypt.compare(
-    input.password,
-    user.password_hash,
-  );
+  const passwordMatch = await checkPasswordMatch(input, existingUser);
 
   if (!passwordMatch) {
     throw new IncorrectPasswordError(
@@ -55,34 +55,10 @@ export const loginUser = async (input: UserInput): Promise<AuthResponse> => {
     );
   }
 
-  const accessToken = signJwt(
-    {
-      userId: user.user_id,
-      email: user.email,
-    },
-    TokenOptions.ACCESS,
-    {
-      expiresIn: Config.ACCESS_TOKEN_EXPIRES_IN,
-    },
-  );
+  const user = createUserObject(existingUser);
+  const tokenPair = createTokenPair(user);
 
-  const refreshToken = signJwt(
-    {
-      userId: user.user_id,
-    },
-    TokenOptions.REFRESH,
-    {
-      expiresIn: Config.REFRESH_TOKEN_EXPIRES_IN,
-    },
-  );
-
-  return {
-    userId: user.user_id,
-    email: user.email,
-    emailVerified: user.email_verified,
-    accessToken,
-    refreshToken,
-  };
+  return { ...user, ...tokenPair };
 };
 
 export const createUser = async (input: UserInput): Promise<User> => {
@@ -98,7 +74,7 @@ export const createUser = async (input: UserInput): Promise<User> => {
       },
     });
 
-    return snakeToCamelCase(user);
+    return createUserObject(user);
   } catch (err: any) {
     if (err.code === PrismaErrorCodes.UNIQUE_CONSTRAINT_FAILED) {
       throw new EmailExistsError(

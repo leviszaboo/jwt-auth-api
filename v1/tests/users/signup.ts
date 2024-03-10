@@ -2,6 +2,7 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 import request from "supertest";
 import { exampleUser, apiKey, appId, app, endpoints } from "../helpers/setup";
 import { ZodIssue } from "zod";
+import { User } from "../../types/user.types";
 
 export const signUpRouteTest = () =>
   describe("[POST] /api/v1/users/sign-up", () => {
@@ -16,14 +17,15 @@ export const signUpRouteTest = () =>
 
       expect(status).toBe(200);
 
-      // user_id is uuid: ^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
+      expectTypeOf(body).toMatchTypeOf<User>();
 
+      // userId is uuid: ^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
       expect(body).toMatchObject({
-        user_id: expect.stringMatching(
+        userId: expect.stringMatching(
           /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/,
         ),
         email: exampleUser.email,
-        email_verified: false,
+        emailVerified: false,
       });
     });
 

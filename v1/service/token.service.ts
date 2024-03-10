@@ -1,8 +1,9 @@
 import { prisma } from "../db/prisma";
-import { signJwt, verifyJwt } from "../utils/jwt.utils";
+import { verifyJwt } from "../utils/jwt.utils";
 import { TokenPair } from "../types/token.types";
 import { getUserById } from "./user.service";
-import { Config, TokenOptions } from "../utils/options";
+import { TokenOptions } from "../utils/options";
+import { createTokenPair } from "./helpers/createTokenPair";
 
 export const checkBlackListedToken = async (
   token: string,
@@ -43,31 +44,7 @@ export const reissueAccessToken = async (
       refreshToken: null,
     };
 
-  const { email, userId } = user;
+  const tokenPair = createTokenPair(user);
 
-  const newRefreshToken = signJwt(
-    {
-      userId,
-    },
-    TokenOptions.REFRESH,
-    {
-      expiresIn: Config.REFRESH_TOKEN_EXPIRES_IN,
-    },
-  );
-
-  const newAccessToken = signJwt(
-    {
-      userId,
-      email,
-    },
-    TokenOptions.ACCESS,
-    {
-      expiresIn: Config.ACCESS_TOKEN_EXPIRES_IN,
-    },
-  );
-
-  return {
-    accessToken: newAccessToken,
-    refreshToken: newRefreshToken,
-  };
+  return { ...tokenPair };
 };
