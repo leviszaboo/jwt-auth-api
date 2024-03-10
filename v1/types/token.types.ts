@@ -1,4 +1,4 @@
-import type { PrismaModels } from "./PrismaModels";
+import type { PrismaModels } from "./types";
 
 export type BlackList = PrismaModels["blacklist"];
 

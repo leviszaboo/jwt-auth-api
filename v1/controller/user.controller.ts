@@ -19,6 +19,7 @@ import IncorrectPasswordError from "../errors/user/IncorrectPasswordError";
 import EmailExistsError from "../errors/user/EmailExistsError";
 import { setTokenCookie } from "../utils/jwt.utils";
 import logger from "../utils/logger";
+import InternalServerError from "../errors/global/InternalServerError";
 
 export async function getUserByIdHandler(
   req: Request<GetUserByIdInput["params"]>,

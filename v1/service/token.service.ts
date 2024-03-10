@@ -40,9 +40,11 @@ export async function reissueAccessToken(
       refreshToken: null,
     };
 
+  const { email, userId } = user;
+
   const newRefreshToken = signJwt(
     {
-      userId: user.user_id,
+      userId,
     },
     "refresh",
     {
@@ -52,8 +54,8 @@ export async function reissueAccessToken(
 
   const newAccessToken = signJwt(
     {
-      userId: user.user_id,
-      email: user.email,
+      userId,
+      email,
     },
     "access",
     {

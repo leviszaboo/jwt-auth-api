@@ -8,12 +8,6 @@ export default {
   bcrypt: {
     salt: 10,
   },
-  db: {
-    dbHost: process.env.MYSQL_HOST,
-    dbUser: process.env.MYSQL_USER,
-    dbPassword: process.env.MYSQL_ROOT_PASSWORD,
-    dbName: process.env.MYSQL_DATABASE,
-  },
   jwt: {
     jwtAccessTokenPrivateKey: process.env.ACT_PRIVATE_KEY,
     jwtAccessTokenPublicKey: process.env.ACT_PUBLIC_KEY,

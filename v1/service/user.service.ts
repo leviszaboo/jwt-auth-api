@@ -1,42 +1,31 @@
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
-import {
-  UserInput,
-  User,
-  OmitPasswordHash,
-  AuthResponse,
-} from "../types/user.types";
+import { UserInput, User, AuthResponse, ModelUser } from "../types/user.types";
 import { prisma } from "../db/prisma";
 import { signJwt } from "../utils/jwt.utils";
 import UserNotFoundError from "../errors/user/UserNotFoundError";
-import config from "config";
 import IncorrectPasswordError from "../errors/user/IncorrectPasswordError";
 import EmailExistsError from "../errors/user/EmailExistsError";
 import logger from "../utils/logger";
-import { omit } from "lodash";
+import { snakeToCamelCase } from "./helpers/snakeToCamelCase";
+import { Config, PrismaErrorCodes, TokenOptions } from "../utils/options";
+import InternalServerError from "../errors/global/InternalServerError";
 
-const salt = config.get<number>("bcrypt.salt");
-
-export async function getUserById(id: string): Promise<OmitPasswordHash<User>> {
+export const getUserById = async (id: string): Promise<User> => {
   const user = await prisma.users.findUnique({
     where: {
       user_id: id,
     },
-    select: {
-      user_id: true,
-      email: true,
-      email_verified: true,
-    },
   });
 
   if (!user) {
-    throw new UserNotFoundError("User not found with the provided user ID.");
+    throw new UserNotFoundError(`User not found with ID: ${id}`);
   }
 
-  return user;
-}
+  return snakeToCamelCase(user);
+};
 
-export async function getUserByEmail(email: string): Promise<User> {
+export const getUserByEmail = async (email: string): Promise<ModelUser> => {
   const user = await prisma.users.findUnique({
     where: {
       email: email,
@@ -45,14 +34,14 @@ export async function getUserByEmail(email: string): Promise<User> {
 
   if (!user) {
     throw new UserNotFoundError(
-      "User not found with the provided email address.",
+      `User not found with the provided email address: ${email}`,
     );
   }
 
   return user;
-}
+};
 
-export async function loginUser(input: UserInput): Promise<AuthResponse> {
+export const loginUser = async (input: UserInput): Promise<AuthResponse> => {
   const user = await getUserByEmail(input.email);
 
   const passwordMatch = await bcrypt.compare(
@@ -62,39 +51,43 @@ export async function loginUser(input: UserInput): Promise<AuthResponse> {
 
   if (!passwordMatch) {
     throw new IncorrectPasswordError(
-      "Incorrect password for the provided email address.",
+      "The provided password does not match the user's password.",
     );
   }
 
-  const token = signJwt(
+  const accessToken = signJwt(
     {
       userId: user.user_id,
       email: user.email,
     },
-    "access",
+    TokenOptions.ACCESS,
     {
-      expiresIn: config.get<string>("jwt.accessTokenExpiresIn"),
+      expiresIn: Config.ACCESS_TOKEN_EXPIRES_IN,
     },
   );
 
-  const refreshToken = signJwt({ userId: user.user_id }, "refresh", {
-    expiresIn: config.get<string>("jwt.refreshTokenExpiresIn"),
-  });
+  const refreshToken = signJwt(
+    {
+      userId: user.user_id,
+    },
+    TokenOptions.REFRESH,
+    {
+      expiresIn: Config.REFRESH_TOKEN_EXPIRES_IN,
+    },
+  );
 
   return {
-    user_id: user.user_id,
+    userId: user.user_id,
     email: user.email,
-    email_verified: user.email_verified,
-    accessToken: token,
-    refreshToken: refreshToken,
+    emailVerified: user.email_verified,
+    accessToken,
+    refreshToken,
   };
-}
+};
 
-export async function createUser(
-  input: UserInput,
-): Promise<OmitPasswordHash<User>> {
+export const createUser = async (input: UserInput): Promise<User> => {
   const userId = uuidv4();
-  const passwordHash = await bcrypt.hash(input.password, salt);
+  const passwordHash = await bcrypt.hash(input.password, Config.BCRYPT_SALT);
 
   try {
     const user = await prisma.users.create({
@@ -105,21 +98,21 @@ export async function createUser(
       },
     });
 
-    return omit(user, "password_hash");
+    return snakeToCamelCase(user);
   } catch (err: any) {
-    if (err.code === "P2002") {
+    if (err.code === PrismaErrorCodes.UNIQUE_CONSTRAINT_FAILED) {
       throw new EmailExistsError(
-        "A user with the provided email address already exists.",
+        `A user with the email address ${input.email} already exists.`,
       );
     }
 
     logger.error(err);
 
-    throw err;
+    throw new InternalServerError("An error occurred while creating the user.");
   }
-}
+};
 
-export async function deleteUser(id: string) {
+export const deleteUser = async (id: string) => {
   try {
     await prisma.users.delete({
       where: {
@@ -129,17 +122,20 @@ export async function deleteUser(id: string) {
 
     return true;
   } catch (err: any) {
-    if ((err.code = "P2025")) {
-      throw new UserNotFoundError("User not found with the provided user ID.");
+    if ((err.code = PrismaErrorCodes.RECORD_NOT_FOUND)) {
+      throw new UserNotFoundError(`User not found with ID: ${id}`);
     }
 
     logger.error(err);
 
-    throw err;
+    throw new InternalServerError("An error occurred while deleting the user.");
   }
-}
+};
 
-export async function updateEmail(id: string, newEmail: string) {
+export const updateEmail = async (
+  id: string,
+  newEmail: string,
+): Promise<boolean> => {
   try {
     await prisma.users.update({
       where: {
@@ -152,18 +148,23 @@ export async function updateEmail(id: string, newEmail: string) {
 
     return true;
   } catch (err: any) {
-    if ((err.code = "P2025")) {
-      throw new UserNotFoundError("User not found with the provided user ID.");
+    if ((err.code = PrismaErrorCodes.RECORD_NOT_FOUND)) {
+      throw new UserNotFoundError(`User not found with ID: ${id}`);
     }
 
     logger.error(err);
 
-    throw err;
+    throw new InternalServerError(
+      "An error occurred while updating the user's email.",
+    );
   }
-}
+};
 
-export async function updatePassword(id: string, newPassword: string) {
-  const passwordHash = await bcrypt.hash(newPassword, salt);
+export const updatePassword = async (
+  id: string,
+  newPassword: string,
+): Promise<boolean> => {
+  const passwordHash = await bcrypt.hash(newPassword, Config.BCRYPT_SALT);
 
   try {
     await prisma.users.update({
@@ -177,12 +178,14 @@ export async function updatePassword(id: string, newPassword: string) {
 
     return true;
   } catch (err: any) {
-    if ((err.code = "P2025")) {
-      throw new UserNotFoundError("User not found with the provided user ID.");
+    if ((err.code = PrismaErrorCodes.RECORD_NOT_FOUND)) {
+      throw new UserNotFoundError(`User not found with ID: ${id}`);
     }
 
     logger.error(err);
 
-    throw err;
+    throw new InternalServerError(
+      "An error occurred while updating the user's password.",
+    );
   }
-}
+};

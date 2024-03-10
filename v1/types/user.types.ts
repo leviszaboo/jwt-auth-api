@@ -1,4 +1,4 @@
-import type { PrismaModels } from "./PrismaModels";
+import type { PrismaModels, KeysToCamelCase } from "./types";
 import { TokenPair } from "./token.types";
 
 export type OmitPasswordHash<T> = Omit<T, "password_hash">;
@@ -8,6 +8,18 @@ export type UserInput = {
   password: string;
 };
 
-export type User = PrismaModels["users"];
+export type UpdateEmailInput = {
+  id: string;
+  newEmail: string;
+};
 
-export type AuthResponse = OmitPasswordHash<User> & TokenPair;
+export type UpdatePasswordInput = {
+  id: string;
+  newPassword: string;
+};
+
+export type ModelUser = PrismaModels["users"];
+
+export type User = KeysToCamelCase<OmitPasswordHash<ModelUser>>;
+
+export type AuthResponse = User & TokenPair;
