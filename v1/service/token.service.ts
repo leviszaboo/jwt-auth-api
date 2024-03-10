@@ -2,8 +2,11 @@ import { prisma } from "../db/prisma";
 import { signJwt, verifyJwt } from "../utils/jwt.utils";
 import { TokenPair } from "../types/token.types";
 import { getUserById } from "./user.service";
+import { Config, TokenOptions } from "../utils/options";
 
-export async function checkBlackListedToken(token: string): Promise<boolean> {
+export const checkBlackListedToken = async (
+  token: string,
+): Promise<boolean> => {
   const blacklisted = await prisma.blacklist.findUnique({
     where: {
       token: token,
@@ -11,20 +14,20 @@ export async function checkBlackListedToken(token: string): Promise<boolean> {
   });
 
   return !!blacklisted;
-}
+};
 
-export async function blackListToken(token: string): Promise<void> {
+export const blackListToken = async (token: string): Promise<void> => {
   await prisma.blacklist.create({
     data: {
       token: token,
     },
   });
-}
+};
 
-export async function reissueAccessToken(
+export const reissueAccessToken = async (
   refreshToken: string,
-): Promise<TokenPair> {
-  const { decoded } = await verifyJwt(refreshToken, "refresh");
+): Promise<TokenPair> => {
+  const { decoded } = await verifyJwt(refreshToken, TokenOptions.REFRESH);
 
   if (!decoded)
     return {
@@ -46,9 +49,9 @@ export async function reissueAccessToken(
     {
       userId,
     },
-    "refresh",
+    TokenOptions.REFRESH,
     {
-      expiresIn: "1d",
+      expiresIn: Config.REFRESH_TOKEN_EXPIRES_IN,
     },
   );
 
@@ -57,9 +60,9 @@ export async function reissueAccessToken(
       userId,
       email,
     },
-    "access",
+    TokenOptions.ACCESS,
     {
-      expiresIn: "5m",
+      expiresIn: Config.ACCESS_TOKEN_EXPIRES_IN,
     },
   );
 
@@ -67,4 +70,4 @@ export async function reissueAccessToken(
     accessToken: newAccessToken,
     refreshToken: newRefreshToken,
   };
-}
+};
