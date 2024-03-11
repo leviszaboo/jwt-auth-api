@@ -1,29 +1,14 @@
-import config from "config";
-import routes from "./routes";
 import logger from "./utils/logger";
-import createServer from "./utils/createServer";
-import { GracefulShutdownManager } from "@moebius/http-graceful-shutdown";
-import { Server } from "http";
-import { disconnectPostgres } from "./db/cleanup";
+import {
+  createServer,
+  gracefulShutdown,
+  shutdownSignals,
+} from "./utils/express.utils";
 import swaggerDocs from "./utils/swagger";
-import { exit } from "process";
+import { handleConnection } from "./db/connect";
+import { Config } from "./utils/options";
 
-const port = config.get<number>("port");
-
-const shutdownSignals: NodeJS.Signals[] = ["SIGINT", "SIGTERM", "SIGHUP"];
-
-function gracefulShutdown(
-  server: Server,
-  signal: (typeof shutdownSignals)[number],
-) {
-  const shutdownManager = new GracefulShutdownManager(server);
-  logger.info(`Received ${signal}. Starting graceful shutdown.`);
-  disconnectPostgres();
-  shutdownManager.terminate(() => {
-    logger.info("Server is gracefully terminated");
-    exit(0);
-  });
-}
+const port = Config.PORT;
 
 export async function startServer() {
   const app = createServer();
@@ -31,6 +16,8 @@ export async function startServer() {
   const server = app.listen(port, () => {
     logger.info(`App is running on http://localhost:${port}`);
     logger.info(`Initializing PostgreSQL connection...`);
+
+    handleConnection();
 
     swaggerDocs(app, port);
   });

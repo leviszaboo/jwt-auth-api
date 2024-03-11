@@ -1,24 +1,25 @@
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
-import { UserInput, User, AuthResponse, ModelUser } from "../types/user.types";
-import { prisma } from "../db/prisma";
+import { UserInput, User, AuthResponse } from "../types/user.types";
 import UserNotFoundError from "../errors/user/UserNotFoundError";
 import IncorrectPasswordError from "../errors/user/IncorrectPasswordError";
 import EmailExistsError from "../errors/user/EmailExistsError";
 import logger from "../utils/logger";
-import { snakeToCamelCase } from "./helpers/snakeToCamelCase";
-import { Config, PrismaErrorCodes, TokenOptions } from "../utils/options";
+import { Config, PrismaErrorCodes } from "../utils/options";
 import InternalServerError from "../errors/global/InternalServerError";
 import { createTokenPair } from "./helpers/createTokenPair";
-import { omit } from "lodash";
 import { checkPasswordMatch } from "./helpers/checkPasswordMatch";
 import { createUserObject } from "./helpers/createUserObject";
+import {
+  deleteUserByUniqueKey,
+  getUserByUniqueKey,
+  prismaCreateUser,
+  updateUserField,
+} from "../utils/prisma.utils";
 
 export const getUserById = async (id: string): Promise<User> => {
-  const user = await prisma.users.findUnique({
-    where: {
-      user_id: id,
-    },
+  const user = await getUserByUniqueKey({
+    user_id: id,
   });
 
   if (!user) {
@@ -28,24 +29,14 @@ export const getUserById = async (id: string): Promise<User> => {
   return createUserObject(user);
 };
 
-export const getUserByEmail = async (email: string): Promise<ModelUser> => {
-  const user = await prisma.users.findUnique({
-    where: {
-      email: email,
-    },
+export const loginUser = async (input: UserInput): Promise<AuthResponse> => {
+  const existingUser = await getUserByUniqueKey({
+    email: input.email,
   });
 
-  if (!user) {
-    throw new UserNotFoundError(
-      `User not found with the provided email address: ${email}`,
-    );
+  if (!existingUser) {
+    throw new UserNotFoundError(`User not found with email: ${input.email}`);
   }
-
-  return user;
-};
-
-export const loginUser = async (input: UserInput): Promise<AuthResponse> => {
-  const existingUser = await getUserByEmail(input.email);
 
   const passwordMatch = await checkPasswordMatch(input, existingUser);
 
@@ -58,7 +49,10 @@ export const loginUser = async (input: UserInput): Promise<AuthResponse> => {
   const user = createUserObject(existingUser);
   const tokenPair = createTokenPair(user);
 
-  return { ...user, ...tokenPair };
+  return {
+    ...user,
+    ...tokenPair,
+  };
 };
 
 export const createUser = async (input: UserInput): Promise<User> => {
@@ -66,12 +60,10 @@ export const createUser = async (input: UserInput): Promise<User> => {
   const passwordHash = await bcrypt.hash(input.password, Config.BCRYPT_SALT);
 
   try {
-    const user = await prisma.users.create({
-      data: {
-        user_id: userId,
-        email: input.email,
-        password_hash: passwordHash,
-      },
+    const user = await prismaCreateUser({
+      user_id: userId,
+      password_hash: passwordHash,
+      ...input,
     });
 
     return createUserObject(user);
@@ -90,10 +82,8 @@ export const createUser = async (input: UserInput): Promise<User> => {
 
 export const deleteUser = async (id: string) => {
   try {
-    await prisma.users.delete({
-      where: {
-        user_id: id,
-      },
+    await deleteUserByUniqueKey({
+      user_id: id,
     });
 
     return true;
@@ -113,26 +103,19 @@ export const updateEmail = async (
   newEmail: string,
 ): Promise<boolean> => {
   try {
-    await prisma.users.update({
-      where: {
-        user_id: id,
-      },
-      data: {
-        email: newEmail,
-      },
+    await updateUserField(id, {
+      email: newEmail,
     });
 
     return true;
   } catch (err: any) {
-    if ((err.code = PrismaErrorCodes.RECORD_NOT_FOUND)) {
+    if (err.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
       throw new UserNotFoundError(`User not found with ID: ${id}`);
     }
 
     logger.error(err);
 
-    throw new InternalServerError(
-      "An error occurred while updating the user's email.",
-    );
+    throw new InternalServerError("An error occurred while updating the user.");
   }
 };
 
@@ -143,25 +126,18 @@ export const updatePassword = async (
   const passwordHash = await bcrypt.hash(newPassword, Config.BCRYPT_SALT);
 
   try {
-    await prisma.users.update({
-      where: {
-        user_id: id,
-      },
-      data: {
-        password_hash: passwordHash,
-      },
+    await updateUserField(id, {
+      password_hash: passwordHash,
     });
 
     return true;
   } catch (err: any) {
-    if ((err.code = PrismaErrorCodes.RECORD_NOT_FOUND)) {
+    if (err.code === PrismaErrorCodes.RECORD_NOT_FOUND) {
       throw new UserNotFoundError(`User not found with ID: ${id}`);
     }
 
     logger.error(err);
 
-    throw new InternalServerError(
-      "An error occurred while updating the user's password.",
-    );
+    throw new InternalServerError("An error occurred while updating the user.");
   }
 };

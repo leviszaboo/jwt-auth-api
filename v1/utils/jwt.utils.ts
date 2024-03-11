@@ -2,17 +2,12 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { Response } from "express";
 import config from "config";
 import { checkBlackListedToken } from "../service/token.service";
+import { Config } from "./options";
 
-const accessTokenPrivateKey = config.get<string>(
-  "jwt.jwtAccessTokenPrivateKey",
-);
-const accessTokenPublicKey = config.get<string>("jwt.jwtAccessTokenPublicKey");
-const refreshTokenPrivateKey = config.get<string>(
-  "jwt.jwtRefreshTokenPrivateKey",
-);
-const refreshTokenPublicKey = config.get<string>(
-  "jwt.jwtRefreshTokenPrivateKey",
-);
+const accessTokenPrivateKey = Config.ACCESS_TOKEN_PRIVATE_KEY;
+const accessTokenPublicKey = Config.ACCESS_TOKEN_PUBLIC_KEY;
+const refreshTokenPrivateKey = Config.REFRESH_TOKEN_PRIVATE_KEY;
+const refreshTokenPublicKey = Config.REFRESH_TOKEN_PUBLIC_KEY;
 
 interface UserPayload extends JwtPayload {
   userId: string;

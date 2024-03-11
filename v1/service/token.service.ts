@@ -1,27 +1,26 @@
-import { prisma } from "../db/prisma";
 import { verifyJwt } from "../utils/jwt.utils";
 import { TokenPair } from "../types/token.types";
 import { getUserById } from "./user.service";
 import { TokenOptions } from "../utils/options";
 import { createTokenPair } from "./helpers/createTokenPair";
+import {
+  createBlacklistedToken,
+  getBlacklistedTokenByUniqueKey,
+} from "../utils/prisma.utils";
 
 export const checkBlackListedToken = async (
   token: string,
 ): Promise<boolean> => {
-  const blacklisted = await prisma.blacklist.findUnique({
-    where: {
-      token: token,
-    },
+  const blacklisted = await getBlacklistedTokenByUniqueKey({
+    token: token,
   });
 
   return !!blacklisted;
 };
 
 export const blackListToken = async (token: string): Promise<void> => {
-  await prisma.blacklist.create({
-    data: {
-      token: token,
-    },
+  await createBlacklistedToken({
+    token: token,
   });
 };
 
@@ -46,5 +45,7 @@ export const reissueAccessToken = async (
 
   const tokenPair = createTokenPair(user);
 
-  return { ...tokenPair };
+  return {
+    ...tokenPair,
+  };
 };

@@ -1,6 +1,6 @@
-import type { PrismaModels } from "./types";
+import type { PrismaModels } from "./prisma.types";
 
-export type BlackList = PrismaModels["blacklist"];
+export type ModelBlackList = PrismaModels["blacklist"];
 
 export type TokenPair = {
   accessToken: string | null;

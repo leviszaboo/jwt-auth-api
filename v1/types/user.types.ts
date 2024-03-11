@@ -1,4 +1,5 @@
-import type { PrismaModels, KeysToCamelCase } from "./types";
+import type { PrismaModels } from "./prisma.types";
+import { KeysToCamelCase } from "./types";
 import { TokenPair } from "./token.types";
 
 export type OmitPasswordHash<T> = Omit<T, "password_hash">;

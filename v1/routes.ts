@@ -1,4 +1,4 @@
-import { Express, Request, Response } from "express";
+import e, { Express, Request, Response } from "express";
 import {
   createUserHandler,
   deleteUserHandler,
@@ -24,6 +24,7 @@ import {
   invalidateTokenSchema,
   reissueTokenSchema,
 } from "./schema/token.schema";
+import { Endpoints } from "./utils/options";
 
 export default function routes(app: Express) {
   /**
@@ -56,7 +57,7 @@ export default function routes(app: Express) {
    *       description: Internal server error
    */
   app.post(
-    "/api/v1/users/sign-up",
+    Endpoints.SIGNUP,
     validateResource(createUserSchema),
     createUserHandler,
   );
@@ -91,7 +92,7 @@ export default function routes(app: Express) {
    *       description: Internal server error
    */
   app.post(
-    "/api/v1/users/login",
+    Endpoints.LOGIN,
     validateResource(loginUserSchema),
     loginUserHandler,
   );
@@ -126,7 +127,7 @@ export default function routes(app: Express) {
    *       description: Internal server error
    */
   app.get(
-    "/api/v1/users/:userId",
+    Endpoints.GET_USER,
     validateResource(getUserByIdSchema),
     getUserByIdHandler,
   );
@@ -163,7 +164,7 @@ export default function routes(app: Express) {
    *         description: Internal server error # This is a proper YAML comment
    */
   app.put(
-    "/api/v1/users/:userId/update-email",
+    Endpoints.UPDATE_EMAIL,
     validateResource(updateEmailSchema),
     updateEmailHandler,
   );
@@ -200,14 +201,14 @@ export default function routes(app: Express) {
    *         description: Internal server error
    */
   app.put(
-    "/api/v1/users/:userId/update-password",
+    Endpoints.UPDATE_PASSWORD,
     validateResource(updatePasswordSchema),
     updatePasswordHandler,
   );
 
-  app.post("/api/v1/users/:userId/send-verification-email");
+  app.post(Endpoints.SEND_VERIFICATION_EMAIL);
 
-  app.put("/api/v1/users/:userId/verify-email");
+  app.put(Endpoints.VERIFY_EMAIL);
 
   /**
    * @openapi
@@ -235,7 +236,7 @@ export default function routes(app: Express) {
    *         description: Internal server error
    */
   app.delete(
-    "/api/v1/users/:userId",
+    Endpoints.DELETE_USER,
     validateResource(getUserByIdSchema),
     deleteUserHandler,
   );
@@ -270,7 +271,7 @@ export default function routes(app: Express) {
    *       description: Internal server error
    */
   app.post(
-    "/api/v1/tokens/reissue-token",
+    Endpoints.REISSUE_TOKEN,
     validateResource(reissueTokenSchema),
     reissueAccessTokenHandler,
   );
@@ -297,7 +298,7 @@ export default function routes(app: Express) {
    *         description: Internal server error
    */
   app.post(
-    "/api/v1/tokens/invalidate-token",
+    Endpoints.INVALIDATE_TOKEN,
     validateResource(invalidateTokenSchema),
     invalidateTokenHandler,
   );

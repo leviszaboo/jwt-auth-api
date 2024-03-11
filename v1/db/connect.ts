@@ -1,7 +1,7 @@
 import { prisma } from "./prisma";
 import logger from "../utils/logger";
 
-async function handleConnection(elapsedTime: number = 0): Promise<void> {
+export async function handleConnection(elapsedTime: number = 0): Promise<void> {
   const maxTime = 120000;
 
   if (elapsedTime >= maxTime) {
@@ -27,5 +27,3 @@ async function handleConnection(elapsedTime: number = 0): Promise<void> {
     }
   }
 }
-
-handleConnection();
