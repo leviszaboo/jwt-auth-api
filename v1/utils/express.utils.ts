@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authenticate from "../middleware/authenticate";
@@ -8,12 +8,16 @@ import { Server } from "http";
 import { disconnectPostgres } from "../db/cleanup";
 import { exit } from "process";
 import logger from "../utils/logger";
+import { RequestHandler } from "express";
+import * as Errors from "../errors";
 
 export const shutdownSignals: NodeJS.Signals[] = [
   "SIGINT",
   "SIGTERM",
   "SIGHUP",
 ];
+
+const errorClasses = Object.values(Errors);
 
 export const createServer = () => {
   const app = express();
@@ -23,6 +27,7 @@ export const createServer = () => {
   app.use(cors());
   app.use(express.json());
   app.use(cookieParser());
+  app.use(errorHandler);
   app.use(authenticate);
 
   routes(app);
@@ -40,5 +45,33 @@ export const gracefulShutdown = (
   shutdownManager.terminate(() => {
     logger.info("Server is gracefully terminated");
     exit(0);
+  });
+};
+
+export const asyncHandler =
+  <P = {}, ResBody = any, ReqBody = any, ReqQuery = {}>(
+    fn: RequestHandler<P, ResBody, ReqBody, ReqQuery>,
+  ): RequestHandler<P, ResBody, ReqBody, ReqQuery> =>
+  (req, res, next) =>
+    Promise.resolve(fn(req, res, next)).catch(next);
+
+export const errorHandler = (
+  err: any,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
+  if (errorClasses.some((errorClass) => err instanceof errorClass)) {
+    return res.status(err.statusCode).send({
+      ...err,
+    });
+  }
+
+  logger.error(err);
+
+  return res.status(500).send({
+    error: {
+      message: "An unexpected error occurred. Please try again later.",
+    },
   });
 };

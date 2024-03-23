@@ -7,7 +7,7 @@ const options: swaggerJsdoc.Options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "REST API Docs",
+      title: "Gator App API Docs",
       version: "1.0.0",
     },
   },
@@ -16,12 +16,12 @@ const options: swaggerJsdoc.Options = {
       apiKey: {
         type: "apiKey",
         in: "header",
-        name: "X-API-Key",
+        name: "X-Gator-Api-Key",
       },
       appId: {
         type: "apiKey",
         in: "header",
-        name: "X-App-Id",
+        name: "X-Gator-App-Id",
       },
     },
   },

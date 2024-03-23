@@ -1,12 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import { UserInput, User, AuthResponse } from "../types/user.types";
-import UserNotFoundError from "../errors/user/UserNotFoundError";
-import IncorrectPasswordError from "../errors/user/IncorrectPasswordError";
-import EmailExistsError from "../errors/user/EmailExistsError";
+import {
+  UserNotFoundError,
+  EmailExistsError,
+  IncorrectPasswordError,
+  InternalServerError,
+} from "../errors";
 import logger from "../utils/logger";
 import { Config, PrismaErrorCodes } from "../utils/options";
-import InternalServerError from "../errors/global/InternalServerError";
 import { createTokenPair } from "./helpers/createTokenPair";
 import { checkPasswordMatch } from "./helpers/checkPasswordMatch";
 import { createUserObject } from "./helpers/createUserObject";
@@ -80,7 +82,7 @@ export const createUser = async (input: UserInput): Promise<User> => {
   }
 };
 
-export const deleteUser = async (id: string) => {
+export const deleteUser = async (id: string): Promise<boolean> => {
   try {
     await deleteUserByUniqueKey({
       user_id: id,
