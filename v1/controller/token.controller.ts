@@ -9,12 +9,10 @@ import {
   InvalidateTokenInput,
   ReissueTokenInput,
 } from "../schema/token.schema";
+import { asyncHandler } from "../utils/express.utils";
 
-export async function reissueAccessTokenHandler(
-  req: Request<{}, {}, ReissueTokenInput["body"]>,
-  res: Response,
-) {
-  try {
+export const reissueAccessTokenHandler = asyncHandler(
+  async (req: Request<{}, {}, ReissueTokenInput["body"]>, res: Response) => {
     const { refreshToken } = req.body;
 
     const blacklisted = await checkBlackListedToken(refreshToken);
@@ -31,20 +29,11 @@ export async function reissueAccessTokenHandler(
     }
 
     return res.send({ newAccessToken, newRefreshToken });
-  } catch (err: any) {
-    logger.error(err);
+  },
+);
 
-    return res
-      .status(500)
-      .send("Unable to reissue access token. Please try again.");
-  }
-}
-
-export async function invalidateTokenHandler(
-  req: Request<{}, {}, InvalidateTokenInput["body"]>,
-  res: Response,
-) {
-  try {
+export const invalidateTokenHandler = asyncHandler(
+  async (req: Request<{}, {}, InvalidateTokenInput["body"]>, res: Response) => {
     const { accessToken, refreshToken } = req.body;
 
     for (const token of [accessToken, refreshToken]) {
@@ -58,9 +47,5 @@ export async function invalidateTokenHandler(
     res.setHeader("Authorization", "");
     res.clearCookie("refresh");
     res.sendStatus(204);
-  } catch (err: any) {
-    logger.error(err);
-
-    return res.status(500).send("Unsuccessful logout. Please try again.");
-  }
-}
+  },
+);
