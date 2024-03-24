@@ -3,12 +3,12 @@ import { signUpRouteTest } from "./signup";
 import { loginRouteTest } from "./login";
 import { forIn } from "lodash";
 
-import { endpoints } from "../helpers/setup";
+import { Endpoints } from "../../utils/options";
 import { getUserRouteTest } from "./getUser";
 
 //Check for correct authentication on all routes
 
-forIn(endpoints, (value) => testAuthMiddleware(value));
+forIn(Endpoints, (value) => testAuthMiddleware(value));
 
 // Running integration tests in sequential order
 

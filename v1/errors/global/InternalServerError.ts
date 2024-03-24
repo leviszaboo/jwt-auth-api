@@ -1,6 +1,6 @@
 interface InternalServerError extends Error {
   statusCode: number;
-  code: string;
+  errorCode: string;
 }
 
 class InternalServerError extends Error {
@@ -8,7 +8,7 @@ class InternalServerError extends Error {
     super(message);
     this.name = "InternalServerError";
     this.statusCode = 500;
-    this.code = "INTERNAL_SERVER_ERROR";
+    this.errorCode = "INTERNAL_SERVER_ERROR";
   }
 }
 

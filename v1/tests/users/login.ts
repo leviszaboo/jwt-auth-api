@@ -1,12 +1,13 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import request from "supertest";
 import { AuthResponse } from "../../types/user.types";
-import { exampleUser, apiKey, appId, app, endpoints } from "../helpers/setup";
+import { exampleUser, apiKey, appId, app } from "../helpers/setup";
+import { Endpoints } from "../../utils/options";
 import { ZodIssue } from "zod";
 
 export const loginRouteTest = () =>
   describe("[POST] /api/v1/users/login", () => {
-    const endpoint = endpoints.LOGIN;
+    const endpoint = Endpoints.LOGIN;
 
     it("should respond with a `200` status code and user info when a valid api key and app id is present", async () => {
       const { status, body } = await request(app)
@@ -31,19 +32,24 @@ export const loginRouteTest = () =>
     });
 
     it("should respond with a `404` status code when the user does not exist", async () => {
+      const invalidUser = {
+        email: "faulty@gator.io",
+        password: "testpassword",
+      };
       const { status, body } = await request(app)
         .post(endpoint)
-        .send({ email: "faulty@gator.io", password: "testpassword" })
+        .send(invalidUser)
         .set("x-gator-api-key", apiKey)
         .set("x-gator-app-id", appId);
 
       expect(status).toBe(404);
 
       expect(body).toMatchObject({
-        name: "UserNotFoundError",
-        message: "User not found with the provided email address.",
-        statusCode: 404,
-        errorCode: "USER_NOT_FOUND",
+        error: {
+          name: "UserNotFoundError",
+          message: `User not found with email: ${invalidUser.email}`,
+          errorCode: "USER_NOT_FOUND",
+        },
       });
     });
 

@@ -65,7 +65,7 @@ export const createUser = async (input: UserInput): Promise<User> => {
     const user = await prismaCreateUser({
       user_id: userId,
       password_hash: passwordHash,
-      ...input,
+      email: input.email,
     });
 
     return createUserObject(user);

@@ -1,12 +1,13 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import request from "supertest";
-import { exampleUser, apiKey, appId, app, endpoints } from "../helpers/setup";
+import { exampleUser, apiKey, appId, app } from "../helpers/setup";
+import { Endpoints } from "../../utils/options";
 import { ZodIssue } from "zod";
 import { User } from "../../types/user.types";
 
 export const signUpRouteTest = () =>
   describe("[POST] /api/v1/users/sign-up", () => {
-    const endpoint = endpoints.SIGNUP;
+    const endpoint = Endpoints.SIGNUP;
 
     it("should respond with a `200` status code and user info when a valid api key and app id is present", async () => {
       const { status, body } = await request(app)
@@ -39,10 +40,11 @@ export const signUpRouteTest = () =>
       expect(status).toBe(409);
 
       expect(body).toMatchObject({
-        name: "EmailExistsError",
-        message: "A user with the provided email address already exists.",
-        statusCode: 409,
-        errorCode: "EMAIL_ALREADY_EXISTS",
+        error: {
+          name: "EmailExistsError",
+          message: `A user with the email address ${exampleUser.email} already exists.`,
+          errorCode: "EMAIL_ALREADY_EXISTS",
+        },
       });
     });
 

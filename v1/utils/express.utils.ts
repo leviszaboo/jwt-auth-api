@@ -26,11 +26,13 @@ export const errorHandler = (
   _next: NextFunction,
 ) => {
   if (errorClasses.some((errorClass) => err instanceof errorClass)) {
-    res.status(500).send({
+    const { name, errorCode, message } = err;
+
+    res.status(err.statusCode).send({
       error: {
-        name: err.name,
-        code: err.code,
-        message: err.message,
+        name,
+        errorCode,
+        message,
       },
     });
   }

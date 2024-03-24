@@ -1,16 +1,17 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import request from "supertest";
-import { exampleUser, apiKey, appId, app, endpoints } from "../helpers/setup";
+import { exampleUser, apiKey, appId, app } from "../helpers/setup";
+import { Endpoints } from "../../utils/options";
 import { User } from "../../types/user.types";
 import { ZodIssue } from "zod";
 
 export const getUserRouteTest = () =>
   describe("[GET] /api/v1/users/:userId", () => {
-    const endpoint = endpoints.GET_USER;
+    const endpoint = Endpoints.GET_USER;
 
     it("should respond with a `200` status code and user info when a valid api key and app id is present", async () => {
       const loginResponse = await request(app)
-        .post(endpoints.LOGIN)
+        .post(Endpoints.LOGIN)
         .send(exampleUser)
         .set("x-gator-api-key", apiKey)
         .set("x-gator-app-id", appId);
@@ -18,7 +19,7 @@ export const getUserRouteTest = () =>
       const loginBody = loginResponse.body;
 
       const { status, body } = await request(app)
-        .get(endpoint.replace(":userId", loginBody.user_id))
+        .get(endpoint.replace(":userId", loginBody.userId))
         .set("x-gator-api-key", apiKey)
         .set("x-gator-app-id", appId);
 
@@ -27,27 +28,27 @@ export const getUserRouteTest = () =>
       expectTypeOf(body).toMatchTypeOf<User>();
 
       expect(body).toMatchObject({
-        userId: loginBody.user_id,
+        userId: loginBody.userId,
         email: exampleUser.email,
         emailVerified: false,
       });
     });
 
     it("should respond with a `404` status code when the user does not exist", async () => {
+      const invalidUserId = "00000000-0000-0000-0000-000000000000";
       const { status, body } = await request(app)
-        .get(
-          endpoint.replace(":userId", "00000000-0000-0000-0000-000000000000"),
-        )
+        .get(endpoint.replace(":userId", invalidUserId))
         .set("x-gator-api-key", apiKey)
         .set("x-gator-app-id", appId);
 
       expect(status).toBe(404);
 
       expect(body).toMatchObject({
-        name: "UserNotFoundError",
-        message: "User not found with the provided user ID.",
-        statusCode: 404,
-        errorCode: "USER_NOT_FOUND",
+        error: {
+          name: "UserNotFoundError",
+          message: `User not found with ID: ${invalidUserId}`,
+          errorCode: "USER_NOT_FOUND",
+        },
       });
     });
 
