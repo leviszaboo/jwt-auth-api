@@ -14,7 +14,7 @@ import {
   UpdateEmailInput,
   UpdatePasswordInput,
 } from "../schema/user.schema";
-import { asyncHandler } from "../utils/express.utils";
+import asyncHandler from "express-async-handler";
 
 export const getUserByIdHandler = asyncHandler(
   async (req: Request<GetUserByIdInput["params"]>, res: Response) => {

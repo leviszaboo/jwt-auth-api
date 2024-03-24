@@ -1,7 +1,5 @@
 import type { PrismaClient, Prisma } from "@prisma/client";
 import { Models } from "../utils/options";
-import { ModelBlackList } from "./token.types";
-import { ModelUser } from "./user.types";
 
 export type ModelNames = Prisma.ModelName;
 

@@ -23,26 +23,30 @@ describe("getUserByIdHandler", () => {
       send: vi.fn(),
     };
 
+    const next = vi.fn();
+
     const user: User = {
       userId: "1",
       email: "email@email.com",
       emailVerified: false,
     };
 
-    const spy = vi.spyOn(UserService, "getUserById");
+    const getUserByIdSpy = vi.spyOn(UserService, "getUserById");
 
-    expect(spy.getMockName()).toEqual("getUserById");
+    expect(getUserByIdSpy.getMockName()).toEqual("getUserById");
 
-    spy.mockResolvedValue(user);
+    getUserByIdSpy.mockResolvedValue(user);
 
     await getUserByIdHandler(
       request as Request<GetUserByIdInput["params"]>,
       response as Response,
+      next,
     );
 
-    expect(spy).toHaveBeenCalledWith("1");
+    expect(getUserByIdSpy).toHaveBeenCalledWith("1");
     expect(response.status).toHaveBeenCalledWith(200);
     expect(response.send).toHaveBeenCalledWith(user);
+    expect(next).not.toHaveBeenCalled();
   });
 
   it("should return 404 if user not found", async () => {
@@ -57,27 +61,27 @@ describe("getUserByIdHandler", () => {
       send: vi.fn(),
     };
 
-    const spy = vi.spyOn(UserService, "getUserById");
+    const next = vi.fn();
 
-    expect(spy.getMockName()).toEqual("getUserById");
+    const getUserByIdSpy = vi.spyOn(UserService, "getUserById");
+
+    expect(getUserByIdSpy.getMockName()).toEqual("getUserById");
 
     const err = new UserNotFoundError(
       "User not found with the provided user ID.",
     );
 
-    spy.mockRejectedValue(err);
+    getUserByIdSpy.mockRejectedValue(err);
 
     await getUserByIdHandler(
       request as Request<GetUserByIdInput["params"]>,
       response as Response,
+      next,
     );
 
-    expect(spy).toHaveBeenCalledWith("1");
-    expect(response.status).toHaveBeenCalledWith(404);
-    expect(response.send).toHaveBeenCalledWith({
-      ...err,
-      message: err.message,
-    });
+    expect(response.send).not.toHaveBeenCalled();
+    expect(response.status).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(err);
   });
 
   it("should return 500 if other error occurs", async () => {
@@ -92,22 +96,26 @@ describe("getUserByIdHandler", () => {
       send: vi.fn(),
     };
 
-    const spy = vi.spyOn(UserService, "getUserById");
+    const next = vi.fn();
 
-    expect(spy.getMockName()).toEqual("getUserById");
+    const err = new Error("Some error occurred");
 
-    spy.mockRejectedValue(new Error("Some error occurred"));
+    const getUserByIdSpy = vi.spyOn(UserService, "getUserById");
+
+    expect(getUserByIdSpy.getMockName()).toEqual("getUserById");
+
+    getUserByIdSpy.mockRejectedValue(err);
 
     await getUserByIdHandler(
       request as Request<GetUserByIdInput["params"]>,
       response as Response,
+      next,
     );
 
-    expect(spy).toHaveBeenCalledWith("1");
+    expect(getUserByIdSpy).toHaveBeenCalledWith("1");
 
-    expect(response.status).toHaveBeenCalledWith(500);
-    expect(response.send).toHaveBeenCalledWith({
-      message: "Could not retrieve user. Please try again.",
-    });
+    expect(response.send).not.toHaveBeenCalled();
+    expect(response.status).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(err);
   });
 });

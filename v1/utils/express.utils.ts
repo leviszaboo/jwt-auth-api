@@ -19,6 +19,29 @@ export const shutdownSignals: NodeJS.Signals[] = [
 
 const errorClasses = Object.values(Errors);
 
+export const errorHandler = (
+  err: any,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
+  if (errorClasses.some((errorClass) => err instanceof errorClass)) {
+    res.status(500).send({
+      error: {
+        name: err.name,
+        code: err.code,
+        message: err.message,
+      },
+    });
+  }
+
+  res.status(500).send({
+    error: {
+      message: "An unexpected error occurred. Please try again later.",
+    },
+  });
+};
+
 export const createServer = () => {
   const app = express();
 
@@ -27,10 +50,11 @@ export const createServer = () => {
   app.use(cors());
   app.use(express.json());
   app.use(cookieParser());
-  app.use(errorHandler);
   app.use(authenticate);
 
   routes(app);
+
+  app.use(errorHandler);
 
   return app;
 };
@@ -45,33 +69,5 @@ export const gracefulShutdown = (
   shutdownManager.terminate(() => {
     logger.info("Server is gracefully terminated");
     exit(0);
-  });
-};
-
-export const asyncHandler =
-  <P = {}, ResBody = any, ReqBody = any, ReqQuery = {}>(
-    fn: RequestHandler<P, ResBody, ReqBody, ReqQuery>,
-  ): RequestHandler<P, ResBody, ReqBody, ReqQuery> =>
-  (req, res, next) =>
-    Promise.resolve(fn(req, res, next)).catch(next);
-
-export const errorHandler = (
-  err: any,
-  _req: Request,
-  res: Response,
-  _next: NextFunction,
-) => {
-  if (errorClasses.some((errorClass) => err instanceof errorClass)) {
-    return res.status(err.statusCode).send({
-      ...err,
-    });
-  }
-
-  logger.error(err);
-
-  return res.status(500).send({
-    error: {
-      message: "An unexpected error occurred. Please try again later.",
-    },
   });
 };

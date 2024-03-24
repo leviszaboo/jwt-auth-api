@@ -1,13 +1,10 @@
 import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
-import prisma from "../../../db/__mocks__/prisma";
+import * as PrismaUtils from "../../../utils/prisma.utils";
+import * as createUserObject from "../../helpers/createUserObject";
 
 import { getUserById } from "../../../service/user.service";
 import UserNotFoundError from "../../../errors/user/UserNotFoundError";
-import { User } from "../../../types/user.types";
-
-vi.mock("../../../db/prisma", () => ({
-  prisma,
-}));
+import { ModelUser, User } from "../../../types/user.types";
 
 describe("getUserById", () => {
   afterEach(() => {
@@ -17,25 +14,29 @@ describe("getUserById", () => {
   it("should return user data", async () => {
     const id = "1";
 
+    const modelUser: ModelUser = {
+      user_id: "1",
+      email: "email@email.com",
+      email_verified: false,
+      password_hash: "password_hash",
+    };
+
     const user: User = {
       userId: "1",
       email: "email@email.com",
       emailVerified: false,
     };
 
-    prisma.users.findUnique.mockResolvedValue(user as any); // not aware of select
+    const getUserByUniqueKeySpy = vi.spyOn(PrismaUtils, "getUserByUniqueKey");
+    const createUserObjectSpy = vi.spyOn(createUserObject, "createUserObject");
+
+    getUserByUniqueKeySpy.mockResolvedValue(modelUser);
+    createUserObjectSpy.mockReturnValue(user);
+
     const result = await getUserById(id);
 
-    expect(prisma.users.findUnique).toHaveBeenCalledWith({
-      where: {
-        user_id: id,
-      },
-      select: {
-        user_id: true,
-        email: true,
-        email_verified: true,
-      },
-    });
+    expect(getUserByUniqueKeySpy).toHaveBeenCalledWith({ user_id: id });
+    expect(createUserObjectSpy).toHaveBeenCalledWith(modelUser);
 
     expectTypeOf(result).toEqualTypeOf<User>();
 
@@ -45,7 +46,9 @@ describe("getUserById", () => {
   it("should throw UserNotFoundError if user not found", async () => {
     const id = "1";
 
-    prisma.users.findUnique.mockResolvedValue(null);
+    const getUserByUniqueKeySpy = vi.spyOn(PrismaUtils, "getUserByUniqueKey");
+
+    getUserByUniqueKeySpy.mockResolvedValue(null);
 
     await expect(getUserById(id)).rejects.toThrow();
     await expect(getUserById(id)).rejects.toThrowError(UserNotFoundError);

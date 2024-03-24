@@ -9,7 +9,7 @@ import {
   InvalidateTokenInput,
   ReissueTokenInput,
 } from "../schema/token.schema";
-import { asyncHandler } from "../utils/express.utils";
+import asyncHandler from "express-async-handler";
 
 export const reissueAccessTokenHandler = asyncHandler(
   async (req: Request<{}, {}, ReissueTokenInput["body"]>, res: Response) => {
@@ -18,17 +18,17 @@ export const reissueAccessTokenHandler = asyncHandler(
     const blacklisted = await checkBlackListedToken(refreshToken);
 
     if (blacklisted) {
-      return res.status(401).send("Invalid refresh token.");
+      res.status(401).send("Invalid refresh token.");
     }
 
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
       await reissueAccessToken(refreshToken);
 
     if (!newAccessToken || !newRefreshToken) {
-      return res.status(401).send("Unsuccessful reissue of access token.");
+      res.status(401).send("Unsuccessful reissue of access token.");
     }
 
-    return res.send({ newAccessToken, newRefreshToken });
+    res.send({ newAccessToken, newRefreshToken });
   },
 );
 
