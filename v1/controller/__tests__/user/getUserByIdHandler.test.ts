@@ -7,7 +7,6 @@ import { User } from "../../../types/user.types";
 
 describe("getUserByIdHandler", () => {
   type GetUserByIdMockRequest = Request<GetUserByIdInput["params"]>;
-
   let request: Partial<GetUserByIdMockRequest>;
   let response: Partial<Response>;
   let next = vi.fn();

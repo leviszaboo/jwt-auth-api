@@ -7,7 +7,7 @@ docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
 
 if [ "$#" -eq  "0" ]
   then
-    vitest run -c ./vitest.config.integration.ts
+    vitest -c ./vitest.config.integration.ts 
 else
     vitest -c ./vitest.config.integration.ts --ui
 fi

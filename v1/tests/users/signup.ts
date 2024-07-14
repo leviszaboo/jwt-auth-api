@@ -62,7 +62,7 @@ export const signUpRouteTest = () =>
       expect(body).toMatchObject([
         {
           code: "invalid_string",
-          message: "Please enter a valid email adress",
+          message: "Please enter a valid email address.",
           path: ["body", "email"],
           validation: "email",
         },

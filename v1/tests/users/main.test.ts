@@ -1,6 +1,7 @@
 import { testAuthMiddleware } from "../middleware/authenticate";
 import { signUpRouteTest } from "./signup";
 import { loginRouteTest } from "./login";
+import { updateEmailRouteTest } from "./updateEmail";
 import { forIn } from "lodash";
 
 import { Endpoints } from "../../utils/options";
@@ -17,3 +18,5 @@ signUpRouteTest();
 loginRouteTest();
 
 getUserRouteTest();
+
+updateEmailRouteTest();

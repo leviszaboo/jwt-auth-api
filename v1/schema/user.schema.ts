@@ -34,7 +34,7 @@ export const loginUserSchema = object({
   body: object({
     email: string({
       required_error: "Email is a required field.",
-    }).email("Please enter a valid email adress"),
+    }).email("Please enter a valid email address."),
     password: string({
       required_error: "Password is a required field.",
     }).min(8, "Password must be at least 8 characters long."),
@@ -71,7 +71,7 @@ export const createUserSchema = object({
   body: object({
     email: string({
       required_error: "Email is a required field.",
-    }).email("Please enter a valid email adress"),
+    }).email("Please enter a valid email address."),
     password: string({
       required_error: "Password is a required field.",
     }).min(8, "Password must be at least 8 characters long."),
@@ -94,7 +94,17 @@ export const updateEmailSchema = object({
   body: object({
     newEmail: string({
       required_error: "New email is a required field.",
-    }).email("Please enter a valid email adress"),
+    }).email("Please enter a valid email address."),
+  }),
+  params: object({
+    userId: string({
+      required_error: "User ID is required.",
+    }).regex(
+      new RegExp(
+        /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/,
+      ),
+      "ID must be a valid UUID.",
+    ),
   }),
 });
 
