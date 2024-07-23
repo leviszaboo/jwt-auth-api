@@ -1,4 +1,5 @@
 import config from "config";
+// import { actPrivateKey, actPublicKey, rftPrivateKey, rftPublicKey } from "../../keys/keys";
 
 export enum PrismaErrorCodes {
   UNIQUE_CONSTRAINT_FAILED = "P2002",
@@ -19,10 +20,10 @@ export enum Endpoints {
   SIGNUP = "/api/v1/users/sign-up",
   LOGIN = "/api/v1/users/login",
   GET_USER = "/api/v1/users/:userId",
-  UPDATE_EMAIL = "/api/v1/users/update-email",
-  UPDATE_PASSWORD = "/api/v1/users/update-password",
-  SEND_VERIFICATION_EMAIL = "/api/v1/users/send-verification-email",
-  VERIFY_EMAIL = "/api/v1/users/verify-email",
+  UPDATE_EMAIL = "/api/v1/users/:userId/update-email",
+  UPDATE_PASSWORD = "/api/v1/users/:userId/update-password",
+  SEND_VERIFICATION_EMAIL = "/api/v1/users/:userId/send-verification-email",
+  VERIFY_EMAIL = "/api/v1/users/:userId/verify-email",
   DELETE_USER = "/api/v1/users/:userId",
   REISSUE_TOKEN = "/api/v1/tokens/reissue-token",
   INVALIDATE_TOKEN = "/api/v1/tokens/invalidate-token",

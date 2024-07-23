@@ -1,6 +1,5 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Response } from "express";
-import config from "config";
 import { checkBlackListedToken } from "../service/token.service";
 import { Config } from "./options";
 

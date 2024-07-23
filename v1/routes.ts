@@ -19,7 +19,6 @@ import {
   reissueAccessTokenHandler,
 } from "./controller/token.controller";
 import validateResource from "./middleware/validateResource";
-import logger from "./utils/logger";
 import {
   invalidateTokenSchema,
   reissueTokenSchema,

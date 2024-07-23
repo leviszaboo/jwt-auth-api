@@ -1,7 +1,8 @@
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import request from "supertest";
 import { AuthResponse } from "../../types/user.types";
 import { exampleUser, apiKey, appId, app } from "../helpers/setup";
+import * as UserService from "../../service/user.service";
 import { Endpoints } from "../../utils/options";
 import { ZodIssue } from "zod";
 
@@ -67,10 +68,32 @@ export const loginRouteTest = () =>
       expect(body).toMatchObject([
         {
           code: "invalid_string",
-          message: "Please enter a valid email adress",
+          message: "Please enter a valid email address.",
           path: ["body", "email"],
           validation: "email",
         },
       ]);
+    });
+
+    it("should respond with a `500` status code when an unexpected error occurs", async () => {
+      const loginUserSpy = vi.spyOn(UserService, "loginUser");
+
+      const err = new Error("Something went wrong");
+
+      loginUserSpy.mockRejectedValue(err);
+
+      const { status, body } = await request(app)
+        .post(endpoint)
+        .send(exampleUser)
+        .set("x-gator-api-key", apiKey)
+        .set("x-gator-app-id", appId);
+
+      expect(status).toBe(500);
+
+      expect(body).toMatchObject({
+        error: {
+          message: "An unexpected error occurred. Please try again later.",
+        },
+      });
     });
   });

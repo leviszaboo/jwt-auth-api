@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import request from "supertest";
-import { exampleUser, apiKey, appId, app } from "../helpers/setup";
+import { exampleUser2, apiKey, appId, app } from "../helpers/setup";
 import { Endpoints } from "../../utils/options";
 import { User } from "../../types/user.types";
 import { ZodIssue } from "zod";
@@ -10,16 +10,8 @@ export const getUserRouteTest = () =>
     const endpoint = Endpoints.GET_USER;
 
     it("should respond with a `200` status code and user info when a valid api key and app id is present", async () => {
-      const loginResponse = await request(app)
-        .post(Endpoints.LOGIN)
-        .send(exampleUser)
-        .set("x-gator-api-key", apiKey)
-        .set("x-gator-app-id", appId);
-
-      const loginBody = loginResponse.body;
-
       const { status, body } = await request(app)
-        .get(endpoint.replace(":userId", loginBody.userId))
+        .get(endpoint.replace(":userId", exampleUser2.userId))
         .set("x-gator-api-key", apiKey)
         .set("x-gator-app-id", appId);
 
@@ -28,8 +20,8 @@ export const getUserRouteTest = () =>
       expectTypeOf(body).toMatchTypeOf<User>();
 
       expect(body).toMatchObject({
-        userId: loginBody.userId,
-        email: exampleUser.email,
+        userId: exampleUser2.userId,
+        email: exampleUser2.email,
         emailVerified: false,
       });
     });

@@ -8,7 +8,6 @@ import { Server } from "http";
 import { disconnectPostgres } from "../db/cleanup";
 import { exit } from "process";
 import logger from "../utils/logger";
-import { RequestHandler } from "express";
 import * as Errors from "../errors";
 
 export const shutdownSignals: NodeJS.Signals[] = [

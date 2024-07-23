@@ -9,11 +9,11 @@ export default {
     salt: 10,
   },
   jwt: {
+    accessTokenExpiresIn: "5m",
+    refreshTokenExpiresIn: "30m",
     jwtAccessTokenPrivateKey: process.env.ACT_PRIVATE_KEY,
     jwtAccessTokenPublicKey: process.env.ACT_PUBLIC_KEY,
     jwtRefreshTokenPrivateKey: process.env.RFT_PRIVATE_KEY,
     jwtRefreshTokenPublicKey: process.env.RFT_PUBLIC_KEY,
-    accessTokenExpiresIn: "5m",
-    refreshTokenExpiresIn: "30m",
   },
 };

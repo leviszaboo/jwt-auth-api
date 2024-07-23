@@ -29,7 +29,7 @@ export const loginUserHandler = asyncHandler(
   async (req: Request<{}, {}, LoginUserInput["body"]>, res: Response) => {
     const authResponseData = await loginUser(req.body);
 
-    res.send(authResponseData);
+    res.status(200).send(authResponseData);
   },
 );
 
@@ -37,7 +37,7 @@ export const createUserHandler = asyncHandler(
   async (req: Request<{}, {}, CreateUserInput["body"]>, res: Response) => {
     const user = await createUser(req.body);
 
-    res.send(user);
+    res.status(200).send(user);
   },
 );
 
