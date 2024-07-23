@@ -10,8 +10,6 @@ services:
     build:
       context: .
       target: base
-    deploy:
-      replicas: 2
     env_file:
       - ./.env
     depends_on:
