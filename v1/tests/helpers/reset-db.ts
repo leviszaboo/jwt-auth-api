@@ -16,7 +16,7 @@ export default async function resetDb() {
       },
     });
   } catch (err: any) {
-    if (err.code !== "P2025") {
+    if (err.code === "P2025") {
       // ignore if the record is not found
     } else {
       throw err;
