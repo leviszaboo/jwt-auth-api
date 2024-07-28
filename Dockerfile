@@ -25,6 +25,8 @@ RUN rm tsconfig.json
 RUN mv ./dist/config ./config
 RUN yarn install --production
 
+RUN npx prisma migrate
+
 CMD ["yarn", "start"]
 
 
