@@ -34,6 +34,8 @@ export const errorHandler = (
         message,
       },
     });
+
+    return;
   }
 
   res.status(500).send({
