@@ -24,6 +24,7 @@ import {
   reissueTokenSchema,
 } from "./schema/token.schema";
 import { Endpoints } from "./utils/options";
+import requireUser from "./middleware/requireUser";
 
 export default function routes(app: Express) {
   app.get(Endpoints.HC, (req: Request, res: Response) => {
@@ -131,6 +132,7 @@ export default function routes(app: Express) {
    */
   app.get(
     Endpoints.GET_USER,
+    requireUser,
     validateResource(getUserByIdSchema),
     getUserByIdHandler,
   );
@@ -168,6 +170,7 @@ export default function routes(app: Express) {
    */
   app.put(
     Endpoints.UPDATE_EMAIL,
+    requireUser,
     validateResource(updateEmailSchema),
     updateEmailHandler,
   );
@@ -205,6 +208,7 @@ export default function routes(app: Express) {
    */
   app.put(
     Endpoints.UPDATE_PASSWORD,
+    requireUser,
     validateResource(updatePasswordSchema),
     updatePasswordHandler,
   );
@@ -240,6 +244,7 @@ export default function routes(app: Express) {
    */
   app.delete(
     Endpoints.DELETE_USER,
+    requireUser,
     validateResource(getUserByIdSchema),
     deleteUserHandler,
   );

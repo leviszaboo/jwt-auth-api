@@ -15,6 +15,7 @@ import {
   UpdatePasswordInput,
 } from "../schema/user.schema";
 import asyncHandler from "express-async-handler";
+import { setTokenCookie } from "../utils/jwt.utils";
 
 export const getUserByIdHandler = asyncHandler(
   async (req: Request<GetUserByIdInput["params"]>, res: Response) => {
@@ -28,6 +29,9 @@ export const getUserByIdHandler = asyncHandler(
 export const loginUserHandler = asyncHandler(
   async (req: Request<{}, {}, LoginUserInput["body"]>, res: Response) => {
     const authResponseData = await loginUser(req.body);
+
+    res.setHeader("Authorization", `Bearer ${authResponseData.accessToken}`);
+    setTokenCookie(res, authResponseData.refreshToken!, "refresh");
 
     res.status(200).send(authResponseData);
   },

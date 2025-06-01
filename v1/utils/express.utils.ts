@@ -10,6 +10,7 @@ import { disconnectPostgres } from "../db/cleanup";
 import { exit } from "process";
 import logger from "../utils/logger";
 import * as Errors from "../errors";
+import { deserializeUser } from "../middleware/deserializeUser";
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -19,10 +20,9 @@ const limiter = rateLimit({
   legacyHeaders: false,
   keyGenerator: (req: Request) => {
     if (!req.ip) {
-      logger.error("Unable to determine client IP for rate limiting");
-      return "unknown-ip"; // Fallback value to satisfy TypeScript
+      return "unknown-ip";
     }
-    return req.ip; // Use IP address as the key for rate limiting
+    return req.ip;
   },
 });
 
@@ -71,6 +71,7 @@ export const createServer = () => {
   app.use(cookieParser());
   app.use(limiter);
   app.use(authenticate);
+  app.use(deserializeUser);
 
   routes(app);
 

@@ -70,8 +70,6 @@ export const updateEmailRouteTest = () =>
         .set("x-gator-api-key", apiKey)
         .set("x-gator-app-id", appId);
 
-      console.log(status, body);
-
       expect(status).toBe(400);
 
       expectTypeOf(body).toMatchTypeOf<ZodIssue[]>();
