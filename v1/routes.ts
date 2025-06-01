@@ -26,6 +26,10 @@ import {
 import { Endpoints } from "./utils/options";
 
 export default function routes(app: Express) {
+  app.get(Endpoints.HC, (req: Request, res: Response) => {
+    res.send("Hello World!");
+  });
+
   /**
    * @openapi
    * '/api/users/sign-up':

@@ -1,6 +1,6 @@
 -- Create tokens table
 CREATE TABLE "blacklist" (
-    "token" VARCHAR(755) NOT NULL,
+    "token" VARCHAR(4096) NOT NULL,
 
     CONSTRAINT "blacklist_pkey" PRIMARY KEY ("token")
 );

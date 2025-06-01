@@ -9,7 +9,7 @@ datasource db {
 }
 
 model blacklist {
-  token String @id @db.VarChar(755)
+  token String @id @db.VarChar(4096)
 }
 
 model users {

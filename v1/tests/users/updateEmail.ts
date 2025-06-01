@@ -14,12 +14,11 @@ export const updateEmailRouteTest = () =>
   describe("[PUT] /api/v1/users/:userId/update-email", () => {
     const endpoint = Endpoints.UPDATE_EMAIL;
 
-    it("should respond with a `204` status code when a valid api key and app id is present", async () => {
+    it("should respond with a `204` status code when a valid api key is present", async () => {
       const { status } = await request(app)
         .put(endpoint.replace(":userId", exampleUser2.userId))
         .send({ newEmail: "newEmail@gator.io" })
-        .set("x-gator-api-key", apiKey)
-        .set("x-gator-app-id", appId);
+        .set("x-gator-api-key", apiKey);
 
       expect(status).toBe(204);
     });

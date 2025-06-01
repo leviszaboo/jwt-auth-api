@@ -9,11 +9,10 @@ export const getUserRouteTest = () =>
   describe("[GET] /api/v1/users/:userId", () => {
     const endpoint = Endpoints.GET_USER;
 
-    it("should respond with a `200` status code and user info when a valid api key and app id is present", async () => {
+    it("should respond with a `200` status code and user info when a valid api key is present", async () => {
       const { status, body } = await request(app)
         .get(endpoint.replace(":userId", exampleUser2.userId))
-        .set("x-gator-api-key", apiKey)
-        .set("x-gator-app-id", appId);
+        .set("x-gator-api-key", apiKey);
 
       expect(status).toBe(200);
 
@@ -30,8 +29,7 @@ export const getUserRouteTest = () =>
       const invalidUserId = "00000000-0000-0000-0000-000000000000";
       const { status, body } = await request(app)
         .get(endpoint.replace(":userId", invalidUserId))
-        .set("x-gator-api-key", apiKey)
-        .set("x-gator-app-id", appId);
+        .set("x-gator-api-key", apiKey);
 
       expect(status).toBe(404);
 
@@ -47,8 +45,7 @@ export const getUserRouteTest = () =>
     it("should respond with a `400` status code and Zod errors when the user id is invalid", async () => {
       const { status, body } = await request(app)
         .get(endpoint.replace(":userId", "invalid-id"))
-        .set("x-gator-api-key", apiKey)
-        .set("x-gator-app-id", appId);
+        .set("x-gator-api-key", apiKey);
 
       expect(status).toBe(400);
 

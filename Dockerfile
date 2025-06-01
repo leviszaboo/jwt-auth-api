@@ -1,4 +1,4 @@
-FROM node:18-alpine as base
+FROM node:20-alpine3.16 as base
 
 WORKDIR /app
 
@@ -24,6 +24,8 @@ RUN rm -rf v1
 RUN rm tsconfig.json
 RUN mv ./dist/config ./config
 RUN yarn install --production
+
+RUN npx prisma migrate
 
 CMD ["yarn", "start"]
 
