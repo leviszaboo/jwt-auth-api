@@ -10,12 +10,11 @@ export const loginRouteTest = () =>
   describe("[POST] /api/v1/users/login", () => {
     const endpoint = Endpoints.LOGIN;
 
-    it("should respond with a `200` status code and user info when a valid api key and app id is present", async () => {
+    it("should respond with a `200` status code and user info when a valid api key is present", async () => {
       const { status, body } = await request(app)
         .post(endpoint)
         .send(exampleUser)
-        .set("x-gator-api-key", apiKey)
-        .set("x-gator-app-id", appId);
+        .set("x-gator-api-key", apiKey);
 
       expect(status).toBe(200);
 

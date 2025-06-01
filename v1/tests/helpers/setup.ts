@@ -1,5 +1,5 @@
 import resetDb from "./reset-db.js";
-import { beforeAll, afterAll, afterEach } from "vitest";
+import { beforeAll } from "vitest";
 import { createServer } from "../../utils/express.utils.js";
 import { UserInput, User } from "../../types/user.types.js";
 import { Config } from "../../utils/options.js";
