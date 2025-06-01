@@ -17,6 +17,13 @@ const limiter = rateLimit({
   message: "Too many requests from this IP, please try again after 10 minutes.",
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: (req: Request) => {
+    if (!req.ip) {
+      logger.error("Unable to determine client IP for rate limiting");
+      return "unknown-ip"; // Fallback value to satisfy TypeScript
+    }
+    return req.ip; // Use IP address as the key for rate limiting
+  },
 });
 
 export const shutdownSignals: NodeJS.Signals[] = [
