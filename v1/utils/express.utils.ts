@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import authenticate from "../middleware/authenticate";
 import routes from "../routes";
 import { GracefulShutdownManager } from "@moebius/http-graceful-shutdown";
 import { Server } from "http";
@@ -11,6 +10,7 @@ import { exit } from "process";
 import logger from "../utils/logger";
 import * as Errors from "../errors";
 import { deserializeUser } from "../middleware/deserializeUser";
+import { pinoHttp } from "pino-http";
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -64,14 +64,25 @@ export const errorHandler = (
 export const createServer = () => {
   const app = express();
 
-  app.enable("trust proxy");
+  app.set("trust proxy", 1);
 
   app.use(cors());
   app.use(express.json());
   app.use(cookieParser());
   app.use(limiter);
-  app.use(authenticate);
   app.use(deserializeUser);
+
+  app.use(
+    pinoHttp({
+      logger,
+      customSuccessMessage: (req, res, responsTime) => {
+        return `${req.method} ${req.url} ${res.statusCode} FROM ${req.ip} - Elapsed time: ${responsTime} ms`;
+      },
+      customErrorMessage: (req, res) => {
+        return `${req.method} ${req.url} ${res.statusCode} FROM ${req.ip}`;
+      },
+    }),
+  );
 
   routes(app);
 

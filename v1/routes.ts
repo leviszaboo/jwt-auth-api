@@ -25,6 +25,7 @@ import {
 } from "./schema/token.schema";
 import { Endpoints } from "./utils/options";
 import requireUser from "./middleware/requireUser";
+import authenticate from "./middleware/authenticate";
 
 export default function routes(app: Express) {
   app.get(Endpoints.HC, (req: Request, res: Response) => {
@@ -62,6 +63,7 @@ export default function routes(app: Express) {
    */
   app.post(
     Endpoints.SIGNUP,
+    authenticate,
     validateResource(createUserSchema),
     createUserHandler,
   );
@@ -97,6 +99,7 @@ export default function routes(app: Express) {
    */
   app.post(
     Endpoints.LOGIN,
+    authenticate,
     validateResource(loginUserSchema),
     loginUserHandler,
   );
@@ -132,6 +135,7 @@ export default function routes(app: Express) {
    */
   app.get(
     Endpoints.GET_USER,
+    authenticate,
     requireUser,
     validateResource(getUserByIdSchema),
     getUserByIdHandler,
@@ -170,6 +174,7 @@ export default function routes(app: Express) {
    */
   app.put(
     Endpoints.UPDATE_EMAIL,
+    authenticate,
     requireUser,
     validateResource(updateEmailSchema),
     updateEmailHandler,
@@ -208,6 +213,7 @@ export default function routes(app: Express) {
    */
   app.put(
     Endpoints.UPDATE_PASSWORD,
+    authenticate,
     requireUser,
     validateResource(updatePasswordSchema),
     updatePasswordHandler,
@@ -244,6 +250,7 @@ export default function routes(app: Express) {
    */
   app.delete(
     Endpoints.DELETE_USER,
+    authenticate,
     requireUser,
     validateResource(getUserByIdSchema),
     deleteUserHandler,
@@ -280,6 +287,7 @@ export default function routes(app: Express) {
    */
   app.post(
     Endpoints.REISSUE_TOKEN,
+    authenticate,
     validateResource(reissueTokenSchema),
     reissueAccessTokenHandler,
   );
@@ -307,6 +315,7 @@ export default function routes(app: Express) {
    */
   app.post(
     Endpoints.INVALIDATE_TOKEN,
+    authenticate,
     validateResource(invalidateTokenSchema),
     invalidateTokenHandler,
   );

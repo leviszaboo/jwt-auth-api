@@ -10,6 +10,6 @@ services:
       target: prod
     ports:
       - "8080:8080"
-  postgres:
-    ports:
-      - "5432:5432"
+    postgres:
+      ports:
+        - "5432:5432"

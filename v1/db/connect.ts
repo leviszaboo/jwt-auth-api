@@ -14,7 +14,7 @@ export async function handleConnection(elapsedTime: number = 0): Promise<void> {
   try {
     await prisma.$connect();
     logger.info(
-      `Successfully connected to PostgreSQL!\nElapsed time: ${elapsedTime / 1000} seconds`,
+      `Successfully connected to PostgreSQL! Elapsed time: ${elapsedTime} ms.`,
     );
   } catch (err: any) {
     if (err.errorCode === "P1001") {
