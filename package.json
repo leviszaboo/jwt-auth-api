@@ -11,7 +11,7 @@
     "start": "node dist/v1/server.js",
     "prepare": "husky || true",
     "test:unit": "vitest run -c ./vitest.config.unit.ts",
-    "test:unit:cov": "vitest -c ./vitest.config.unit.ts --coverage",
+    "test:unit:cov": "vitest run -c ./vitest.config.unit.ts --coverage",
     "test:int": "./scripts/run-integration.sh",
     "test:int:ui": "./scripts/run-integration.sh --ui",
     "test": "yarn test:unit && yarn test:int"
