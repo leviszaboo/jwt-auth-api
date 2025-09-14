@@ -54,9 +54,12 @@ export const errorHandler = (
     return;
   }
 
+  logger.error(err);
+
   res.status(500).send({
     error: {
       message: "An unexpected error occurred. Please try again later.",
+      err: err,
     },
   });
 };
