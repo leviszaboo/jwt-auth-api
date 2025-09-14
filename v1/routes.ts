@@ -26,6 +26,7 @@ import {
 import { Endpoints } from "./utils/options";
 import requireUser from "./middleware/requireUser";
 import authenticate from "./middleware/authenticate";
+import { checkOwnership } from "./middleware/checkOwnership";
 
 export default function routes(app: Express) {
   app.get(Endpoints.HC, (req: Request, res: Response) => {
@@ -128,6 +129,8 @@ export default function routes(app: Express) {
    *        description: Not found
    *      401:
    *        description: Unauthorized
+   *      403:
+   *        description: Forbidden
    *      400:
    *        description: Bad request
    *      500:
@@ -137,6 +140,7 @@ export default function routes(app: Express) {
     Endpoints.GET_USER,
     authenticate,
     requireUser,
+    checkOwnership,
     validateResource(getUserByIdSchema),
     getUserByIdHandler,
   );
@@ -167,6 +171,8 @@ export default function routes(app: Express) {
    *         description: Not found
    *       '401':
    *         description: Unauthorized
+   *       '403':
+   *         description: Forbidden
    *       '400':
    *         description: Bad request
    *       '500':
@@ -176,6 +182,7 @@ export default function routes(app: Express) {
     Endpoints.UPDATE_EMAIL,
     authenticate,
     requireUser,
+    checkOwnership,
     validateResource(updateEmailSchema),
     updateEmailHandler,
   );
@@ -206,6 +213,8 @@ export default function routes(app: Express) {
    *         description: Not found
    *       '401':
    *         description: Unauthorized
+   *       '403':
+   *         description: Forbidden
    *       '400':
    *         description: Bad request
    *       '500':
@@ -215,13 +224,10 @@ export default function routes(app: Express) {
     Endpoints.UPDATE_PASSWORD,
     authenticate,
     requireUser,
+    checkOwnership,
     validateResource(updatePasswordSchema),
     updatePasswordHandler,
   );
-
-  app.post(Endpoints.SEND_VERIFICATION_EMAIL);
-
-  app.put(Endpoints.VERIFY_EMAIL);
 
   /**
    * @openapi
@@ -243,6 +249,8 @@ export default function routes(app: Express) {
    *         description: Not found
    *       '401':
    *         description: Unauthorized
+   *       '403':
+   *         description: Forbidden
    *       '400':
    *         description: Bad request
    *       '500':
@@ -252,6 +260,7 @@ export default function routes(app: Express) {
     Endpoints.DELETE_USER,
     authenticate,
     requireUser,
+    checkOwnership,
     validateResource(getUserByIdSchema),
     deleteUserHandler,
   );
