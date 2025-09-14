@@ -2,15 +2,13 @@ services:
   nginx:
     ports:
       - "80:80"
-    build:
-      target: prod
   node-app:
     build:
       context: .
       target: prod
     env_file:
       - ./.env
-    expose: ["8080"]
+    expose: ["3000"]
   postgres:
     ports:
       - "5432:5432"

@@ -1,4 +1,6 @@
-FROM node:20-alpine3.16 as base
+FROM node:22-slim as base
+
+RUN apt-get update -y && apt-get install -y openssl
 
 WORKDIR /app
 
