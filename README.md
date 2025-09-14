@@ -19,6 +19,20 @@ A production-ready REST API for user authentication using JSON Web Tokens (JWT).
 
 This JWT Authentication API provides a secure user authentication system built with TypeScript and Express. It implements industry-standard security practices with JWT for managing users and secure API access. Below is a graphical overview of the system:
 
+<p align="center">
+  <img 
+    src="https://github.com/user-attachments/assets/71a052bf-72a6-4b5c-9ca5-bb76b4bc1ee7" 
+    alt="Screenshot 2025-09-14 at 21 57 38" 
+    width="717" height="999" 
+    style="padding: 30px;" 
+  />
+  <img 
+    src="https://github.com/user-attachments/assets/7e02e18a-f534-4d1f-b6ff-207ad563cd80" 
+    alt="Screenshot 2025-09-14 at 21 34 19" 
+    width="566" height="520" 
+    style="padding: 30px;" 
+  />
+</p>
 ## Features
 
 - **User Authentication**
