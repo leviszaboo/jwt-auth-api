@@ -11,6 +11,7 @@ import logger from "../utils/logger";
 import * as Errors from "../errors";
 import { deserializeUser } from "../middleware/deserializeUser";
 import { pinoHttp } from "pino-http";
+import helmet from "helmet";
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -69,6 +70,7 @@ export const createServer = () => {
 
   app.set("trust proxy", 1);
 
+  app.use(helmet());
   app.use(cors());
   app.use(express.json());
   app.use(cookieParser());
