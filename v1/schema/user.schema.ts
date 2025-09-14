@@ -1,4 +1,4 @@
-import { TypeOf, object, string } from "zod";
+import { TypeOf, boolean, object, string } from "zod";
 
 /**
  * @openapi
@@ -169,6 +169,24 @@ const params = {
 };
 
 export const getUserByIdSchema = object({ ...params });
+
+export const UserSchema = object({
+  userId: string({
+    required_error: "User ID is required.",
+  }).regex(
+    new RegExp(
+      /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/,
+    ),
+    "ID must be a valid UUID.",
+  ),
+  email: string({
+    required_error: "Email is required",
+  }).email({ message: "Invalid email format" }),
+  emailVerified: boolean({
+    required_error: "emailVerified is a required field.",
+    message: "Invalid field: emailVerified",
+  }),
+});
 
 export type GetUserByIdInput = TypeOf<typeof getUserByIdSchema>;
 export type LoginUserInput = TypeOf<typeof loginUserSchema>;

@@ -39,23 +39,10 @@ export const Endpoints = {
   GET_USER: `${basePath}/users/:userId`,
   UPDATE_EMAIL: `${basePath}/users/:userId/update-email`,
   UPDATE_PASSWORD: `${basePath}/users/:userId/update-password`,
-  SEND_VERIFICATION_EMAIL: `${basePath}/users/:userId/send-verification-email`,
-  VERIFY_EMAIL: `${basePath}/users/:userId/verify-email`,
+  // SEND_VERIFICATION_EMAIL: `${basePath}/users/:userId/send-verification-email`,
+  // VERIFY_EMAIL: `${basePath}/users/:userId/verify-email`,
   DELETE_USER: `${basePath}/users/:userId`,
   REISSUE_TOKEN: `${basePath}/tokens/reissue-token`,
   INVALIDATE_TOKEN: `${basePath}/tokens/invalidate-token`,
   HC: `${basePath}/hc`,
 } as const;
-
-// export enum Endpoints {
-//   SIGNUP = "/api/v1/users/sign-up",
-//   LOGIN = "/api/v1/users/login",
-//   GET_USER = "/api/v1/users/:userId",
-//   UPDATE_EMAIL = "/api/v1/users/:userId/update-email",
-//   UPDATE_PASSWORD = "/api/v1/users/:userId/update-password",
-//   SEND_VERIFICATION_EMAIL = "/api/v1/users/:userId/send-verification-email",
-//   VERIFY_EMAIL = "/api/v1/users/:userId/verify-email",
-//   DELETE_USER = "/api/v1/users/:userId",
-//   REISSUE_TOKEN = "/api/v1/tokens/reissue-token",
-//   INVALIDATE_TOKEN = "/api/v1/tokens/invalidate-token",
-// }
