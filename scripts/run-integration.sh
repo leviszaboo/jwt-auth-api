@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 # scripts/run-integration.sh
 
-DIR="$(cd "$(dirname "$0")" && pwd)"
-source $DIR/setenv.sh
+# Export DATABASE_URL
+export DATABASE_URL=$(grep -v '^#' .env.test | grep '^DATABASE_URL=' | cut -d '=' -f 2-)
+
+# Export POSTGRES_PASSWORD
+export POSTGRES_PASSWORD=$(grep -v '^#' .env.test | grep '^POSTGRES_PASSWORD=' | cut -d '=' -f 2-)
+
+export NODE_ENV='test'
+
 docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
 
 if [ "$#" -eq  "0" ]

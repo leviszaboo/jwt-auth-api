@@ -18,17 +18,11 @@ const options: swaggerJsdoc.Options = {
         in: "header",
         name: "X-Gator-Api-Key",
       },
-      appId: {
-        type: "apiKey",
-        in: "header",
-        name: "X-Gator-App-Id",
-      },
     },
   },
   security: [
     {
       apiKey: [],
-      appId: [],
     },
   ],
   apis: ["./v1/routes.ts", "./v1/schema/*.ts"],

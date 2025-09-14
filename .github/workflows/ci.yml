@@ -22,6 +22,7 @@ jobs:
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v2.0
         with:
+          file_name: .env.test
           envkey_API_KEY: ${{ secrets.API_KEY }}
           envkey_APP_ID: ${{ secrets.APP_ID }}
           envkey_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
@@ -58,3 +59,7 @@ jobs:
           envkey_BCYPT_SALT: ${{ secrets.BCYPT_SALT }}
       - name: Production build
         run: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 15

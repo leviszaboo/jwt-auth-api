@@ -10,8 +10,9 @@ services:
     build:
       context: .
       target: base
-    env_file:
-      - ./.env
+    deploy:
+      mode: replicated
+      replicas: 2
     depends_on:
       postgres:
         condition: service_healthy

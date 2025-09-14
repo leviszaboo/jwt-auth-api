@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import authenticate from "../middleware/authenticate";
 import routes from "../routes";
 import { GracefulShutdownManager } from "@moebius/http-graceful-shutdown";
 import { Server } from "http";
@@ -10,6 +9,9 @@ import { disconnectPostgres } from "../db/cleanup";
 import { exit } from "process";
 import logger from "../utils/logger";
 import * as Errors from "../errors";
+import { deserializeUser } from "../middleware/deserializeUser";
+import { pinoHttp } from "pino-http";
+import helmet from "helmet";
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -19,10 +21,9 @@ const limiter = rateLimit({
   legacyHeaders: false,
   keyGenerator: (req: Request) => {
     if (!req.ip) {
-      logger.error("Unable to determine client IP for rate limiting");
-      return "unknown-ip"; // Fallback value to satisfy TypeScript
+      return "unknown-ip";
     }
-    return req.ip; // Use IP address as the key for rate limiting
+    return req.ip;
   },
 });
 
@@ -54,9 +55,12 @@ export const errorHandler = (
     return;
   }
 
+  logger.error(err);
+
   res.status(500).send({
     error: {
       message: "An unexpected error occurred. Please try again later.",
+      err: err,
     },
   });
 };
@@ -64,13 +68,26 @@ export const errorHandler = (
 export const createServer = () => {
   const app = express();
 
-  app.enable("trust proxy");
+  app.set("trust proxy", 1);
 
+  app.use(helmet());
   app.use(cors());
   app.use(express.json());
   app.use(cookieParser());
   app.use(limiter);
-  app.use(authenticate);
+  app.use(deserializeUser);
+
+  app.use(
+    pinoHttp({
+      logger,
+      customSuccessMessage: (req, res, responsTime) => {
+        return `${req.method} ${req.url} ${res.statusCode} FROM ${req.ip} - Elapsed time: ${responsTime} ms`;
+      },
+      customErrorMessage: (req, res) => {
+        return `${req.method} ${req.url} ${res.statusCode} FROM ${req.ip}`;
+      },
+    }),
+  );
 
   routes(app);
 

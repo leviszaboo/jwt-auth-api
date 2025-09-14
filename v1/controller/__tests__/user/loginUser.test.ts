@@ -1,5 +1,14 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  MockInstance,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import * as UserService from "../../../service/user.service";
+import * as JwtUtils from "../../../utils/jwt.utils";
 import { loginUserHandler } from "../../user.controller";
 import { Request, Response } from "express";
 import { LoginUserInput } from "../../../schema/user.schema";
@@ -11,6 +20,7 @@ describe("loginUserHandler", () => {
   let request: Partial<LoginUserMockRequest>;
   let response: Partial<Response>;
   let next = vi.fn();
+  let setCookieSpy: MockInstance;
 
   beforeEach(() => {
     request = {
@@ -20,10 +30,14 @@ describe("loginUserHandler", () => {
       },
     };
     response = {
-      send: vi.fn(),
+      send: vi.fn().mockReturnThis(),
       status: vi.fn().mockReturnThis(),
+      setHeader: vi.fn().mockReturnThis(),
     };
     next = vi.fn();
+    setCookieSpy = vi
+      .spyOn(JwtUtils, "setTokenCookie")
+      .mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -39,11 +53,9 @@ describe("loginUserHandler", () => {
       emailVerified: false,
     };
 
-    const spy = vi.spyOn(UserService, "loginUser");
-
-    expect(spy.getMockName()).toEqual("loginUser");
-
-    spy.mockResolvedValue(authResponseData);
+    const spy = vi
+      .spyOn(UserService, "loginUser")
+      .mockResolvedValue(authResponseData);
 
     await loginUserHandler(
       request as LoginUserMockRequest,
@@ -52,8 +64,20 @@ describe("loginUserHandler", () => {
     );
 
     expect(spy).toHaveBeenCalledWith(request.body);
-    expect(response.send).toHaveBeenCalledWith(authResponseData);
+
+    expect(response.setHeader).toHaveBeenCalledWith(
+      "Authorization",
+      `Bearer ${authResponseData.accessToken}`,
+    );
+
+    expect(setCookieSpy).toHaveBeenCalledWith(
+      response as Response,
+      authResponseData.refreshToken,
+      "refresh",
+    );
+
     expect(response.status).toHaveBeenCalledWith(200);
+    expect(response.send).toHaveBeenCalledWith(authResponseData);
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -68,6 +92,8 @@ describe("loginUserHandler", () => {
     );
 
     expect(next).toHaveBeenCalledWith(error);
+    expect(response.setHeader).not.toHaveBeenCalled();
+    expect(setCookieSpy).not.toHaveBeenCalled();
     expect(response.send).not.toHaveBeenCalled();
     expect(response.status).not.toHaveBeenCalled();
   });

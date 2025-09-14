@@ -27,6 +27,7 @@ describe("reissueAccessToken", () => {
       decoded: {
         userId: user.userId,
         email: user.email,
+        emailVerified: user.emailVerified,
       },
     };
 
@@ -86,6 +87,7 @@ describe("reissueAccessToken", () => {
       decoded: {
         userId: "1",
         email: "email",
+        emailVerified: false,
       },
     };
 
