@@ -33,6 +33,7 @@ This JWT Authentication API provides a secure user authentication system built w
     style="padding: 30px;" 
   />
 </p>
+
 ## Features
 
 - **User Authentication**
