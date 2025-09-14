@@ -1,17 +1,13 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { Response } from "express";
 import { checkBlackListedToken } from "../service/token.service";
 import { Config } from "./options";
+import { User } from "../types/user.types";
 
 const accessTokenPrivateKey = Config.ACCESS_TOKEN_PRIVATE_KEY;
 const accessTokenPublicKey = Config.ACCESS_TOKEN_PUBLIC_KEY;
 const refreshTokenPrivateKey = Config.REFRESH_TOKEN_PRIVATE_KEY;
 const refreshTokenPublicKey = Config.REFRESH_TOKEN_PUBLIC_KEY;
-
-interface UserPayload extends JwtPayload {
-  userId: string;
-  email: string;
-}
 
 export function signJwt(
   object: Object,
@@ -43,7 +39,7 @@ export async function verifyJwt(
   try {
     const key =
       tokenType === "access" ? accessTokenPublicKey : refreshTokenPublicKey;
-    const decoded = jwt.verify(token, key) as UserPayload;
+    const decoded = jwt.verify(token, key) as User;
     return {
       valid: true,
       expired: false,

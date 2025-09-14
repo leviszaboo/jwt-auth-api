@@ -6,7 +6,7 @@ import * as UserService from "../../service/user.service";
 import { Endpoints } from "../../utils/options";
 import { ZodIssue } from "zod";
 
-export const loginRouteTest = () =>
+export const loginRouteTest = async () => {
   describe("[POST] /api/v1/users/login", () => {
     const endpoint = Endpoints.LOGIN;
 
@@ -96,3 +96,4 @@ export const loginRouteTest = () =>
       });
     });
   });
+};

@@ -14,7 +14,7 @@ services:
       - ./.env
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 2
     depends_on:
       postgres:
         condition: service_healthy

@@ -17,15 +17,6 @@ import {
 import asyncHandler from "express-async-handler";
 import { setTokenCookie } from "../utils/jwt.utils";
 
-export const getUserByIdHandler = asyncHandler(
-  async (req: Request<GetUserByIdInput["params"]>, res: Response) => {
-    const { userId } = req.params;
-    const user = await getUserById(userId);
-
-    res.status(200).send(user);
-  },
-);
-
 export const loginUserHandler = asyncHandler(
   async (req: Request<{}, {}, LoginUserInput["body"]>, res: Response) => {
     const authResponseData = await loginUser(req.body);
@@ -45,9 +36,20 @@ export const createUserHandler = asyncHandler(
   },
 );
 
+export const getUserByIdHandler = asyncHandler(
+  async (req: Request<GetUserByIdInput["params"]>, res: Response) => {
+    const { userId } = req.params;
+
+    const user = await getUserById(userId);
+
+    res.status(200).send(user);
+  },
+);
+
 export const deleteUserHandler = asyncHandler(
   async (req: Request<GetUserByIdInput["params"]>, res: Response) => {
     const { userId } = req.params;
+
     await deleteUser(userId);
 
     res.sendStatus(204);
@@ -61,6 +63,7 @@ export const updateEmailHandler = asyncHandler(
   ) => {
     const { userId } = req.params;
     const { newEmail } = req.body;
+
     await updateEmail(userId, newEmail);
 
     res.sendStatus(204);
@@ -74,6 +77,7 @@ export const updatePasswordHandler = asyncHandler(
   ) => {
     const { userId } = req.params;
     const { newPassword } = req.body;
+
     await updatePassword(userId, newPassword);
 
     res.sendStatus(204);

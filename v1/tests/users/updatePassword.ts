@@ -1,19 +1,11 @@
-import { beforeAll, describe, expect, expectTypeOf, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import request from "supertest";
-import {
-  exampleUser2,
-  apiKey,
-  appId,
-  app,
-  exampleUser,
-} from "../helpers/setup";
+import { apiKey, app } from "../helpers/setup";
 import { Endpoints } from "../../utils/options";
-import { User } from "../../types/user.types";
-import { ZodIssue } from "zod";
 
-export const getUserRouteTest = () =>
-  describe("[GET] /api/v1/users/:userId", () => {
-    const endpoint = Endpoints.GET_USER;
+export const updatePasswordRouteTest = () =>
+  describe("[PUT] /api/v1/users/:userId/update-password", () => {
+    const endpoint = Endpoints.UPDATE_PASSWORD;
 
     let userId: string;
     let accessToken: string;
@@ -41,21 +33,16 @@ export const getUserRouteTest = () =>
       accessToken = loginResponse.body.accessToken;
     });
 
-    it("should respond with a `200` status code and user info when a valid api key is present", async () => {
+    it("should respond with a `204` status code when a valid api key is present", async () => {
       const { status, body } = await request(app)
-        .get(endpoint.replace(":userId", userId))
+        .put(endpoint.replace(":userId", userId))
+        .send({ newPassword: `test-${Date.now()}` })
         .set("x-gator-api-key", apiKey)
         .set("Authorization", `Bearer ${accessToken}`);
 
-      expect(status).toBe(200);
+      console.log("BODY", body);
 
-      expectTypeOf(body).toMatchTypeOf<User>();
-
-      expect(body).toMatchObject({
-        userId: userId,
-        email: testUser.email,
-        emailVerified: false,
-      });
+      expect(status).toBe(204);
     });
 
     // TODO

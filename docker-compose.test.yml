@@ -1,4 +1,7 @@
 services:
+  node-app:
+    env_file:
+      - ./.env.test
   postgres:
     ports:
       - "5432:5432"
