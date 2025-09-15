@@ -21,10 +21,11 @@ This JWT Authentication API provides a secure user authentication system built w
 
 <p align="center">
   <img 
-    src="https://github.com/user-attachments/assets/71a052bf-72a6-4b5c-9ca5-bb76b4bc1ee7" 
-    alt="Screenshot 2025-09-14 at 21 57 38" 
-    width="717" height="999" 
-    style="padding: 30px;" 
+    width="700" 
+    height="910" 
+    alt="diagram-export-9-15-2025-10_37_52-AM-2-2" 
+    src="https://github.com/user-attachments/assets/3d9bcd9a-8938-4144-9ec5-23ff83d64d1a" 
+    style="padding: 30px;"
   />
   <img 
     src="https://github.com/user-attachments/assets/7e02e18a-f534-4d1f-b6ff-207ad563cd80" 
